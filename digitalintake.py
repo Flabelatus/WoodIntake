@@ -65,6 +65,9 @@ if __name__ == "__main__":
     # Streamlit on Local URL: http://localhost:8501
     st.title("Data Wood Table")
     st.subheader("Digital Intake Results (Waste Wood from CW4N)")
+    st.text("The following table demonstrates real-time data captured by\n"
+            "the digital intake process in the Robot Lab as means of building\n"
+            "a data base of residual wood.")
     st.write(info)
     st.download_button('Download Table', str(info))
 
