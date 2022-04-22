@@ -54,6 +54,7 @@ class DigitalIntake:
     def convert(self):
         return self.data
 
+
 # class DataBase(object):
 
 #     def __init__(self, data):
@@ -77,16 +78,16 @@ if __name__ == "__main__":
 
     # Streamlit on Local URL: http://localhost:8501
     st.title("Available Wood Table")
-    st.subheader("Digital Intake Results (Waste Wood from CW4N)")
     st.text("The following table demonstrates real-time data captured by\n"
             "the digital intake process in the Robot Lab as means of building\n"
             "a data base of residual wood.")
+    st.subheader("Digital Intake Results (Waste Wood from CW4N)")
     st.write(info)
+    st.subheader(f'TOTAL Number of wood scanned: {len(info["Index"])}\n\n')
     st.download_button('Download Table', str(info), mime='text/csv')
 
-    st.subheader(f'TOTAL Number of wood scanned: {len(info["Index"])}\n\n')
     length_values = info['Length']
-    st.write('Length Distribution in mm\n')
+    st.subheader('Length Distribution in mm\n')
     st.bar_chart(length_values)
 
     st.subheader("Filter Desired Pieces Based on Length")
