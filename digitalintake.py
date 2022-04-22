@@ -50,6 +50,9 @@ class DigitalIntake:
         ])
         return fetched_data
 
+    @st.cache
+    def convert(self):
+        return self.data
 
 # class DataBase(object):
 
@@ -70,21 +73,21 @@ if __name__ == "__main__":
     filename = directory + csv_file
     wood_intake = DigitalIntake(filename)
     wood_intake.display_column(head=10)
-    info = wood_intake.data
+    info = wood_intake.convert()
 
     # Streamlit on Local URL: http://localhost:8501
-    st.title("Data Wood Table")
+    st.title("Available Wood Table")
     st.subheader("Digital Intake Results (Waste Wood from CW4N)")
     st.text("The following table demonstrates real-time data captured by\n"
             "the digital intake process in the Robot Lab as means of building\n"
             "a data base of residual wood.")
     st.write(info)
-    st.download_button('Download Table', str(info))
+    st.download_button('Download Table', str(info), mime='text/csv')
 
     st.subheader(f'TOTAL Number of wood scanned: {len(info["Index"])}\n\n')
-    hist_values = info['Density']
-    st.write('Density Distribution\n')
-    st.bar_chart(hist_values)
+    length_values = info['Length']
+    st.write('Length Distribution in mm\n')
+    st.bar_chart(length_values)
 
     st.subheader("Filter Desired Pieces Based on Length")
     selected_size = st.slider('Length in mm', min(info['Length']), max(info['Length'] + 1))
@@ -98,4 +101,4 @@ if __name__ == "__main__":
 
     selected_df = pd.DataFrame(data)
     st.write(selected_df)
-    st.download_button('Download Selection', str(data))
+    st.download_button('Download Selection', str(data), mime='text/csv')
