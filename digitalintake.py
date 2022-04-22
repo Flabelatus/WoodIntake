@@ -98,3 +98,4 @@ if __name__ == "__main__":
 
     selected_df = pd.DataFrame(data)
     st.write(selected_df)
+    st.download_button('Download Selection', str(data))
