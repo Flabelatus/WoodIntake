@@ -84,7 +84,7 @@ if __name__ == "__main__":
     st.subheader("Digital Intake Results (Waste Wood from CW4N)")
     st.write(info)
     st.subheader(f'TOTAL Number of wood scanned: {len(info["Index"])}\n\n')
-    st.download_button('Download Table', str(info), mime='text/csv')
+    st.download_button('Download Table', str(info))
 
     length_values = info['Length']
     st.subheader('Length Distribution in mm\n')
@@ -102,4 +102,4 @@ if __name__ == "__main__":
 
     selected_df = pd.DataFrame(data)
     st.write(selected_df)
-    st.download_button('Download Selection', str(data), mime='text/csv')
+    st.download_button('Download Selection', str(data))
