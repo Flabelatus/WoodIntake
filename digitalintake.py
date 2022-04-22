@@ -37,7 +37,17 @@ class DigitalIntake:
 
     @st.cache
     def fetch(self, row=None):
-        fetched_data = pd.read_csv(self.name, nrows=row)
+        fetched_data = pd.read_csv(self.name, nrows=row, usecols=[
+            "Index",
+            "Width",
+            "Length",
+            "Height",
+            "Type",
+            "Color",
+            "Indexed",
+            "Density",
+            "Weight"
+        ])
         return fetched_data
 
 
