@@ -10,7 +10,7 @@ class DigitalIntake:
 
     def __init__(self, name):
         self.name = name
-        self.fields = [          
+        self.fields = [
             "Index",
             "Width",
             "Length",
@@ -22,7 +22,6 @@ class DigitalIntake:
             "Weight"
         ]
         self.data = pd.read_csv(self.name, usecols=self.fields, delimiter=',')
-
 
     def __str__(self):
         return f"Data base {self.name}, containing the data in CSV format."
@@ -45,18 +44,6 @@ class DigitalIntake:
     @st.cache
     def convert(self):
         return self.data
-
-
-# class DataBase(object):
-
-#     def __init__(self, data):
-#         self.index = None
-#         self.data = data
-#         self.properties = {}
-#         db = sqlite3.connect("data_wood.sqlite")
-#
-#     def add_data(self, data):
-#         pass
 
 
 if __name__ == "__main__":
@@ -86,7 +73,7 @@ if __name__ == "__main__":
     st.subheader(f"Filter Desired Pieces Based on {criteria}")
     slider_min_val = min(sorted(info[criteria]))
     slider_max_val = max(sorted(info[criteria]))
-    selected_size = st.slider('Length in mm', value=sorted())
+    selected_size = st.slider('Length in mm', min_value=slider_min_val, max_value=slider_max_val)
     st.write("The Items in the table are the ID values"
              " of the pieces under the selected length")
     st.write(selected_size)
