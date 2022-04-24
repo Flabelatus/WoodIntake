@@ -53,6 +53,7 @@ if __name__ == "__main__":
     wood_intake = DigitalIntake(filename)
     wood_intake.display_column(head=3)
     info = wood_intake.convert()
+    df = pd.DataFrame(info)
 
     # Streamlit on Local URL: http://localhost:8501
     st.title("Available Wood Table")
@@ -69,21 +70,21 @@ if __name__ == "__main__":
     st.subheader('Length Distribution in mm\n')
     st.bar_chart(length_values)
 
-    criteria = 'Length'
-    st.subheader(f"Filter Desired Pieces Based on {criteria}")
-    slider_min_val = min(sorted(info[criteria]))
-    slider_max_val = max(sorted(info[criteria]))
-    selected_size = st.slider('Length in mm', min_value=slider_min_val, max_value=slider_max_val)
+    filter_criteria = 'Length'
+    st.subheader(f"Filter Desired Pieces Based on {filter_criteria}")
+    slider_min_val = min(sorted(info[filter_criteria]))
+    slider_max_val = max(sorted(info[filter_criteria]))
+    length_slider = st.slider('Length in mm', min_value=slider_min_val, max_value=slider_max_val)
     st.write("The Items in the table are the ID values"
              " of the pieces under the selected length")
-    st.write(selected_size)
+    st.write(length_slider)
 
-    data = None
-    for index, sizes in enumerate(sorted(info[criteria])):
-        if sizes < selected_size:
-            data = wood_intake.fetch(index)
+    filtered = []
+    for index, row in df.iterrows():
+        if row[filter_criteria] < length_slider:
+            filtered.append(row)
 
-    selected_df = pd.DataFrame(data)
-    print(selected_df)
-    st.write(selected_df)
-    st.download_button('Download Selection', str(data), mime='text/csv')
+    filtered_df = pd.DataFrame(filtered)
+    print(filtered_df)
+    st.write(filtered_df)
+    st.download_button('Download Selection', str(filtered), mime='text/csv')
