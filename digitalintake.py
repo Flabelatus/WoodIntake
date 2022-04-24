@@ -45,15 +45,13 @@ class DigitalIntake:
 
 
 if __name__ == "__main__":
-    directory = getcwd()
-    csv_file = '/Datawood.csv'
-    filename = directory + csv_file
-    wood_intake = DigitalIntake(filename)
-    wood_intake.display_column(head=3)
+    # Initializing data frame from CSV
+    csv_file = getcwd() + '/Datawood.csv'
+    wood_intake = DigitalIntake(csv_file)
     csv_content = wood_intake.convert()
     df = pd.DataFrame(csv_content)
 
-    # Streamlit on Local URL: http://localhost:8501
+    # Setup Streamlit on Local URL: http://localhost:8501
     st.title("Available Wood Table")
     st.text("The following table demonstrates real-time data captured by\n"
             "the digital intake process in the Robot Lab as means of building\n"
@@ -76,10 +74,10 @@ if __name__ == "__main__":
     st.write("The Items in the table are the ID values"
              " of the pieces under the selected length")
 
-    filtered = []
-    for index, row in df.iterrows():
-        if row[filter_criteria] < length_slider:
-            filtered.append(row)
+    filtered = [
+        row for index, row in df.iterrows()
+        if row[filter_criteria] < length_slider
+    ]
 
     filtered_df = pd.DataFrame(filtered)
     print(filtered_df)
