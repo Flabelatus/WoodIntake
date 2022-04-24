@@ -44,7 +44,7 @@ class DigitalIntake:
         return self.data
 
 
-if __name__ == "__main__":
+def main():
     # Initializing data frame from CSV
     csv_file = getcwd() + '/Datawood.csv'
     csv_content = DigitalIntake(csv_file).convert()
@@ -58,7 +58,7 @@ if __name__ == "__main__":
 
     st.subheader("Digital Intake Results (Waste Wood from CW4N)")
     st.write(csv_content)
-    st.subheader(f'TOTAL Number of wood scanned: {len(csv_content["Index"])}\n\n')
+    st.subheader(f'TOTAL Number of wood scanned: {len(csv_content["Index"])}')
     st.download_button('Download Table', str(csv_content), mime='text/csv')
 
     length_values = csv_content['Length']
@@ -82,3 +82,7 @@ if __name__ == "__main__":
     print(filtered_df)
     st.write(filtered_df)
     st.download_button('Download Selection', str(filtered), mime='text/csv')
+
+
+if __name__ == "__main__":
+    main()
