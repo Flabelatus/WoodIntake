@@ -1,6 +1,7 @@
 import pandas as pd
 import streamlit as st
 from os import getcwd
+from PIL import Image
 
 
 class DigitalIntake:
@@ -82,6 +83,17 @@ def main():
     print(filtered_df)
     st.write(filtered_df)
     st.download_button('Download Selection', str(filtered), mime='text/csv')
+
+    colors = csv_content['Color']
+    rgb_column = [row.split(',') for row in list(colors)]
+    rgb = []
+    for rgb_list in rgb_column:
+        rgb.append(tuple([int(value) for value in rgb_list]))
+    # print(rgb)
+
+    for index, colors in enumerate(rgb):
+        img = Image.new('RGB', (120, 120), rgb[index])
+        st.image(img, caption=csv_content['Index'][index])
 
 
 if __name__ == "__main__":
