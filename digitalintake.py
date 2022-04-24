@@ -52,8 +52,8 @@ if __name__ == "__main__":
     filename = directory + csv_file
     wood_intake = DigitalIntake(filename)
     wood_intake.display_column(head=3)
-    info = wood_intake.convert()
-    df = pd.DataFrame(info)
+    csv_content = wood_intake.convert()
+    df = pd.DataFrame(csv_content)
 
     # Streamlit on Local URL: http://localhost:8501
     st.title("Available Wood Table")
@@ -62,22 +62,21 @@ if __name__ == "__main__":
             "a data base of residual wood.")
 
     st.subheader("Digital Intake Results (Waste Wood from CW4N)")
-    st.write(info)
-    st.subheader(f'TOTAL Number of wood scanned: {len(info["Index"])}\n\n')
-    st.download_button('Download Table', str(info), mime='text/csv')
+    st.write(csv_content)
+    st.subheader(f'TOTAL Number of wood scanned: {len(csv_content["Index"])}\n\n')
+    st.download_button('Download Table', str(csv_content), mime='text/csv')
 
-    length_values = info['Length']
+    length_values = csv_content['Length']
     st.subheader('Length Distribution in mm\n')
     st.bar_chart(length_values)
 
     filter_criteria = 'Length'
     st.subheader(f"Filter Desired Pieces Based on {filter_criteria}")
-    slider_min_val = min(sorted(info[filter_criteria]))
-    slider_max_val = max(sorted(info[filter_criteria]))
+    slider_min_val = min(sorted(csv_content[filter_criteria]))
+    slider_max_val = max(sorted(csv_content[filter_criteria]))
     length_slider = st.slider('Length in mm', min_value=slider_min_val, max_value=slider_max_val)
     st.write("The Items in the table are the ID values"
              " of the pieces under the selected length")
-    st.write(length_slider)
 
     filtered = []
     for index, row in df.iterrows():
