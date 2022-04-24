@@ -47,8 +47,7 @@ class DigitalIntake:
 if __name__ == "__main__":
     # Initializing data frame from CSV
     csv_file = getcwd() + '/Datawood.csv'
-    wood_intake = DigitalIntake(csv_file)
-    csv_content = wood_intake.convert()
+    csv_content = DigitalIntake(csv_file).convert()
     df = pd.DataFrame(csv_content)
 
     # Setup Streamlit on Local URL: http://localhost:8501
