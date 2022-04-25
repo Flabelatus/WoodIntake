@@ -1,10 +1,15 @@
 Index,Width,Length,Height,Type,TypeCertainty,Color,Indexed,Density,Weight,MoistureContent,PicturePath,Location
-42018467,128,817,40,Soft Wood,0,"166,123,102",04/20/2022 18:46:07,468.51069915058753,195,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
-4201909,267,757,34,Hard Wood,0,"162,144,121",04/20/2022 19:00:58,582.7538734761273,400,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
-420191111,272,643,36,Hard Wood,0,"166,133,107",04/20/2022 19:11:32,606.755293831196,385,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
-420192013,181,866,36,Soft Wood,0,"165,139,115",04/20/2022 19:20:01,473.30158281050916,265,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
-420193615,123,804,41,Hard Wood,0,"167,125,107",04/20/2022 19:36:06,890.49288424946064,360,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
-42110212,134,810,40,Hard Wood,0,"165,125,102",04/21/2022 10:21:55,838.40990530998522,360,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
-42110464,101,679,40,Hard Wood,0,"166,124,101",04/21/2022 10:46:19,1311.0440500749478,360,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
-42110546,181,742,36,Hard Wood,0,"170,170,170",04/21/2022 10:54:15,746.24888050230413,360,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
-421111310,164,930,44,Hard Wood,0,"167,126,87",04/21/2022 11:13:26,535.95508267643072,360,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
+42018467,128,817,40,Soft Wood,0,"166,123,102",04/20/2022 18:46,468.5106992,195,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
+4201909,267,757,34,Hard Wood,0,"162,144,121",04/20/2022 19:00,582.7538735,400,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
+420191111,272,643,36,Hard Wood,0,"166,133,107",04/20/2022 19:11,606.7552938,385,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
+420192013,181,866,36,Soft Wood,0,"165,139,115",04/20/2022 19:20,473.3015828,265,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
+420193615,123,804,41,Soft Wood,0,"167,125,107",04/20/2022 19:36,371.0387,150,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
+42110212,134,810,40,Soft Wood,0,"165,125,102",04/21/2022 10:21,372.6266,160,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
+42110464,101,679,40,Soft Wood,0,"166,124,101",04/21/2022 10:46,437.0147,120,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
+42110546,181,742,36,Hard Wood,0,"170,170,170",04/21/2022 10:54,538.9575,260,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
+421111310,164,930,44,Soft Wood,0,"167,126,87",04/21/2022 11:13,387.0787,260,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
+42512265,143,398,37,Hard Wood,0,"157,152,140",04/25/2022 12:26,566.1773146,120,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
+42513257,135,809,39,Soft Wood,0,"161,141,125",04/25/2022 13:25,379.5337381,160,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
+42513579,123,693,38,Soft Wood,0,"161,168,160",04/25/2022 13:57,414.6026365,135,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
+42514311,126,664,38,Soft Wood,0,"161,167,160",04/25/2022 14:03,244.8226097,130,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
+42514913,126,652,39,Soft Wood,0,"158,167,162",04/25/2022 14:09,228.2758432,140,0,C:\Users\RobotLab\Documents\DataWood\Main Hub\picture,C:\Users\RobotLab\Documents\DataWood\Main Hub\CSV
