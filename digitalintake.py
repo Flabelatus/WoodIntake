@@ -60,7 +60,7 @@ def main():
     st.subheader("Digital Intake Results (Waste Wood from CW4N)")
     st.write(csv_content)
     st.subheader(f'TOTAL Number of wood scanned: {len(csv_content["Index"])}')
-    st.download_button('Download Table', str(csv_content))
+    st.download_button('Download Table', df.to_csv(), mime='text/csv')
 
     length_values = csv_content['Length']
     st.subheader('Length Distribution in mm\n')
@@ -82,7 +82,7 @@ def main():
     filtered_df = pd.DataFrame(filtered)
     print(filtered_df)
     st.write(filtered_df)
-    st.download_button('Download Selection', str(filtered))
+    st.download_button('Download Selection', filtered_df.to_csv(), mime='text/csv')
 
     colors = csv_content['Color']
     rgb_column = [row.split(',') for row in list(colors)]
