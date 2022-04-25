@@ -60,7 +60,7 @@ def main():
     st.subheader("Digital Intake Results (Waste Wood from CW4N)")
     st.write(csv_content)
     st.subheader(f'TOTAL Number of wood scanned: {len(csv_content["Index"])}')
-    st.download_button('Download Table', str(csv_content), mime='text/csv')
+    st.download_button('Download Table', str(csv_content))
 
     length_values = csv_content['Length']
     st.subheader('Length Distribution in mm\n')
@@ -82,24 +82,39 @@ def main():
     filtered_df = pd.DataFrame(filtered)
     print(filtered_df)
     st.write(filtered_df)
-    st.download_button('Download Selection', str(filtered), mime='text/csv')
+    st.download_button('Download Selection', str(filtered))
 
     colors = csv_content['Color']
     rgb_column = [row.split(',') for row in list(colors)]
+    # List of tuples -> [(R,G,B), ...]
     rgb = []
     for rgb_list in rgb_column:
         rgb.append(tuple([int(value) for value in rgb_list]))
+    # List of tuples -> [(image, id), ...]
     img = []
     for index, colors in enumerate(rgb):
         img.append((
-            Image.new('RGB', (70, 70), rgb[index]),
+            Image.new('RGB', (100, 200), rgb[index]),
             str(csv_content["Index"][index]))
         )
-    st.image([img[i][0] for i in range(len(rgb))],
-             caption=[img[i][1] for i in range(len(rgb))],
-             use_column_width=False,
-             width=70
-             )
+
+    st.subheader('Available Colors in the Database')
+    # string
+    input_text = st.text_input('Please enter the Index'
+                               ' of the desired element to '
+                               'view te color')
+
+    st.image([
+        img[index][0] for index in range(len(rgb))
+        if img[index][1] == input_text
+    ],
+        caption=[
+            img[index][1] for index in range(len(rgb))
+            if img[index][1] == input_text
+        ],
+        use_column_width=False,
+        width=100
+    )
 
 
 if __name__ == "__main__":
