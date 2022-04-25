@@ -86,11 +86,9 @@ def main():
 
     colors = csv_content['Color']
     rgb_column = [row.split(',') for row in list(colors)]
-    # List of tuples -> [(R,G,B), ...]
     rgb = []
     for rgb_list in rgb_column:
         rgb.append(tuple([int(value) for value in rgb_list]))
-    # List of tuples -> [(image, id), ...]
     img = []
     for index, colors in enumerate(rgb):
         img.append((
