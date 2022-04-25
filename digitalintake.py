@@ -89,9 +89,17 @@ def main():
     rgb = []
     for rgb_list in rgb_column:
         rgb.append(tuple([int(value) for value in rgb_list]))
+    img = []
     for index, colors in enumerate(rgb):
-        img = Image.new('RGB', (70, 70), rgb[index])
-        st.image(img, caption=csv_content['Index'][index])
+        img.append((
+            Image.new('RGB', (70, 70), rgb[index]),
+            str(csv_content["Index"][index]))
+        )
+    st.image([img[i][0] for i in range(len(rgb))],
+             caption=[img[i][1] for i in range(len(rgb))],
+             use_column_width=False,
+             width=70
+             )
 
 
 if __name__ == "__main__":
