@@ -1,3 +1,6 @@
+""" Simple demo of an interface from CSV digital intake 
+Javid Jooshesh <j.jooshesh@hva.nl>"""
+
 import pandas as pd
 import streamlit as st
 from os import getcwd
