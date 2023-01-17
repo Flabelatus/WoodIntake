@@ -8,6 +8,7 @@ import numpy as np
 import streamlit as st
 from datetime import datetime
 import plotly.express as px
+import plotly.graph_objects as go
 from os import getcwd
 from PIL import Image
 
@@ -131,6 +132,50 @@ class DigitalIntake:
         self.matching_list = matching_list
         matching_df = pd.DataFrame(matching_list)
         return matching_df
+
+    def match_euc_dis(self, requirements_list):
+        ''' 
+        This function matches the rquirements from the generated requirements based on the Euclidean Distance 
+        and selects fitting  planks from the available dataset. 
+
+        '''
+        wood_list = self.wood_list.copy()
+        matching_list = []
+        k = len(requirements_list)
+        for index, row_req in enumerate(requirements_list):
+            distances = []
+            wood_db = []
+            wood_db_index = []
+
+            for index, row_wood in enumerate(wood_list):
+                if (
+    #                 row_req['Width'] < row_wood['Width'] and row_req['Length'] < row_wood['Length'] and
+                not row_wood['Reserved']):
+                    wood_db.append(np.array([row_wood['Width'], row_wood['Length'], row_wood['Height']]))
+                    wood_db_index.append(row_wood['Index'])
+
+            wood_piece = np.array([row_req['Width'], row_req['Length'], row_req['Height']])
+            if wood_db != []:
+                distances = (np.sqrt(np.sum((wood_db - wood_piece)**2, axis=1)))        
+
+                # Find the indices of the k nearest neighbors in the database
+                k_nearest = np.argsort(distances)[:k]
+
+                # Take the minimum of the k nearest neighbors to determine the best match
+                best_match_index = np.argmin(distances)
+
+                # Add the matched piece to the matched_indices list
+                index = wood_db_index[best_match_index]
+
+    #             print('wood piece: ' + str(wood_piece) + 'wood_db: ' + str(wood_list[index]))
+
+                matching_row = {'Requirements list index': row_req['Index'], 'Wood list index': index}
+                wood_list[index]['Reserved'] = True
+                matching_list.append(matching_row)
+
+
+        matching_df = pd.DataFrame(matching_list)
+        return matching_df
     
 
     @st.cache
@@ -153,8 +198,64 @@ class Graphical_elements:
         fig = px.histogram(self.dataset, x=x_column, color=color,
                            marginal="box", # or violin, rug
                            hover_data=self.dataset.columns)
+
+        return fig
+        
+    def barchart_plotly_one(self, dataset, color):
+
+        fig = go.Figure(data=[go.Bar(
+            x=((dataset['Width'].cumsum() - dataset['Width']/2)).tolist(),
+            y=dataset['Length'],
+            width=(dataset['Width']).tolist(), # customize width here
+            marker_color=color,
+            opacity = 0.8,
+            name = 'wood in database',
+            hovertemplate = 'Width (mm): %{width:.f}, Length (mm): %{y:.f}'
+        )])
+
         return fig
 
+
+    def barchart_plotly_two(self, matching_df, requirement_df):
+        '''
+        This function makes a barchart in which the length and with of the planks are visualized for both
+        the required planks as the wood in the database.
+        '''
+
+
+        wood_df = self.dataset.copy()
+        # join the two, keeping all of df1's indices
+        joined = pd.merge(matching_df, wood_df.loc[:,['Index', 'Width', 'Length', 'Height']],
+                               left_on='Wood list index', right_on = 'Index', how='inner')
+        joined = pd.merge(joined, requirement_df, left_on=['Requirements list index'], right_on=['Index'], how='inner')
+
+        # Make a trace with a bar chart based on a cumsum to make sure all planks are next to each other. 
+        # Furthermore the cumsum of the requirements is added, as these planks need to be in between the planks of the database
+        # Lastly, the x starts before a first requirement plank is added and it is lined up in the middle.
+        trace1 = go.Figure(data=[go.Bar(
+            x=((joined['Width_x'].cumsum()+ joined['Width_y'].cumsum() - joined['Width_y'] - joined['Width_x']/2)).tolist(),
+            y=joined['Length_x'],
+            width=(joined['Width_x']).tolist(), # customize width here
+            marker_color='blue',
+            opacity = 0.8,
+            name = 'wood in database',
+            hovertemplate = 'Width (mm): %{width:.f}, Length (mm): %{y:.f}'
+        )])
+
+        trace2 = go.Figure(data=[go.Bar(
+            x=((joined['Width_x'].cumsum() + joined['Width_y'].cumsum() - joined['Width_y']/2)).tolist(),
+            y=joined['Length_y'],
+            width=(joined['Width_y']).tolist(), # customize width here
+            marker_color='red',
+            opacity = 0.8,
+            name = 'requirement',
+            hovertemplate = 'Width (mm): %{width:.f}, Length (mm): %{y:.f}'
+
+        )])
+
+        fig = go.Figure(data = trace1.data + trace2.data)
+
+        return fig
 
 
 def main():
@@ -192,7 +293,11 @@ def main():
         dataset = pd.DataFrame(wood_list)
         dataset.to_csv("Generated_wood_data.csv", index = False)
 
-    st.subheader("Generate a general requirements set (maybe a chair)")
+
+    image = Image.open('stool_image.jpg')
+    st.image(image, caption='Image of a stool')
+
+    st.subheader("Generate a general requirements set (maybe a stool)")
     if st.button('Generate requirements'):
         st.write('General requirements are generated')
         DigIn.generate_requirements(size = 4, n_planks = 30)
@@ -205,13 +310,16 @@ def main():
     # print(DigIn.requirement_list)
     length_values = dataset['Length']
     st.subheader('Length Distribution in mm of the dataset\n')
-    st.bar_chart(length_values)
+    fig = Graphical_elements(dataset).barchart_plotly_one(
+                dataset.sort_values(by=['Length'], ascending = False), color = 'blue')
+    st.plotly_chart(fig, use_container_width=True)
 
     if os.path.exists('requirements.csv'):
         requirement_df = pd.read_csv('requirements.csv')
         length_values_req = requirement_df['Length']
         st.subheader('Length Distribution in mm of the requirements\n')
-        st.bar_chart(length_values_req)
+        fig = Graphical_elements(dataset).barchart_plotly_one(requirement_df, color = 'red')
+    st.plotly_chart(fig, use_container_width=True)
     
     # st.subheader("Match the requirements with the available wood")
     st.subheader('Reserve the wood based on matched requirements')
@@ -219,7 +327,7 @@ def main():
     res_number = st.text_input('Reservation number', '1')
     st.write('The reservation will be on ', res_name + '-' + res_number)
 
-    if st.button('Match the requirements with the available wood'):
+    if st.button('Match the requirements with the available wood - simple'):
 
         if os.path.exists('requirements.csv'):
             requirement_df = pd.read_csv('requirements.csv')
@@ -232,9 +340,35 @@ def main():
             st.write(matching_df)
             st.write("Matching Dataframe is saved in a CSV file")
             matching_df.to_csv('~/Downloads/WoodIntake-master/matching_df.csv', index = False)
+            #Visualize the matched planks
+            st.subheader('Showing all the planks in the dataset and the matching requirements')
+            fig = Graphical_elements(dataset).barchart_plotly_two(matching_df, requirement_df)
+            st.plotly_chart(fig, use_container_width=True)
+
         else:
             st.write('requirements are not found')
-    
+
+    if st.button('Match the requirements with the available wood - Euclidean Distance'):
+
+        if os.path.exists('requirements.csv'):
+            requirement_df = pd.read_csv('requirements.csv')
+            requirement_list = requirement_df.to_dict('records')
+
+            # st.write(requirement_df)
+            # print(requirement_list)
+            matching_df = DigIn.match_euc_dis(requirement_list)
+            dataset = pd.DataFrame(DigIn.wood_list)
+            st.write(matching_df)
+            st.write("Matching Dataframe is saved in a CSV file")
+            matching_df.to_csv('~/Downloads/WoodIntake-master/matching_df.csv', index = False)
+            #Visualize the matched planks
+            st.subheader('Showing all the planks in the dataset and the matching requirements')
+            fig = Graphical_elements(dataset).barchart_plotly_two(matching_df, requirement_df)
+            st.plotly_chart(fig, use_container_width=True)
+        else:
+            st.write('requirements are not found')
+        
+
         
     if st.button('Reserve the matched wood'):
         matching_df = pd.read_csv('matching_df.csv')
@@ -281,7 +415,6 @@ def main():
         DigIn.wood_list = dataset.to_dict('records')
 
 
-    
     st.subheader('Length Distribution in mm of the dataset in Plotly')
     fig = Graphical_elements(dataset).distplot_plotly(x_column = "Length", y_column = "Width", 
             color = "Type")
