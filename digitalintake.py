@@ -11,13 +11,14 @@ import plotly.express as px
 import plotly.graph_objects as go
 from os import getcwd
 from PIL import Image
+import requests
 
 
 class DigitalIntake:
     """A class to read the saved csv data from the wood intake process"""
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
+        # self.name = name
         self.fields = [
             "Index",
             "Width",
@@ -25,18 +26,44 @@ class DigitalIntake:
             "Height",
             "Type",
             "Color",
-            "Indexed",
+            "Timestamp",
             "Density",
             "Weight",
             'Reserved',
             "Reservation name",
             "Reservation time",
+            "Requirements",
+            "Source",
+            "Price",
+            "Info"
 
         ]
-        self.data = pd.read_csv(self.name, usecols=self.fields, delimiter=',')
+
+        # self.data = pd.read_csv(self.name, usecols=self.fields, delimiter=',')
         # self.wood_list = []
         # self.requirement_list = []
         # self.matching_list = []
+
+    def get_data_api(self):
+
+        
+        # api-endpoint
+        URL = "https://wood-db.onrender.com/residual_wood"      
+        # sending get request and saving the response as response object
+        r = requests.get(url = URL)
+          
+        # extracting data in json format
+        data = r.json()
+        dataset = pd.DataFrame(data)
+        # sget the right order of columns to use
+        dataset.columns = dataset.columns.str.title()
+        dataset.rename(columns={'Id': 'Index', 'Reservation_Time': 'Reservation time',
+                'Reservation_Name': 'Reservation name'}, inplace = True)
+
+        dataset = dataset[self.fields]
+        self.data = dataset
+        self.wood_list = self.data.to_dict('records')
+
 
 
     def __str__(self):
@@ -68,8 +95,9 @@ class DigitalIntake:
             Weight = int(width * length * height * Density / 10000 / 1000)
             
             row = {'Index': index, 'Width': width, 'Length': length, 'Height': height,
-                    'Type': Type, 'Color': Color, 'Indexed': Indexed, 'Density': Density, 'Weight': Weight, 
-                    'Reserved': False, 'Reservation name': '', 'Reservation time': ''}
+                    'Type': Type, 'Color': Color, 'Timestamp': Indexed, 'Density': Density, 'Weight': Weight, 
+                    'Reserved': False, 'Reservation name': '', 'Reservation time': '', "Requirements": 0,
+                    "Source": "Robot Lab", "Price": 5, "Info": ""}
             wood_list.append(row)
 
         self.wood_list = wood_list
@@ -260,13 +288,16 @@ class Graphical_elements:
 
 def main():
     # Initializing data frame from CSV
-    csv_file = getcwd() + '/Generated_wood_data.csv'
-    DigIn = DigitalIntake(csv_file)
-    dataset = DigitalIntake(csv_file).convert()
-    DigIn.wood_list = dataset.to_dict('records')
+    # csv_file = getcwd() + '/Generated_wood_data.csv'
+    DigIn = DigitalIntake()
+    DigIn.get_data_api()
+    dataset = DigIn.data
 
 
-    
+    # dataset = DigitalIntake(csv_file).convert()
+    # DigIn.wood_list = dataset.to_dict('records')
+
+
     # wood_list = DigIn.generate_new_wood(n = 50)
     # dataset = pd.DataFrame(wood_list)
 
