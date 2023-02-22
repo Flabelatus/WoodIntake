@@ -17,8 +17,8 @@ import requests
 class DigitalIntake:
     """A class to read the saved csv data from the wood intake process"""
 
-    def __init__(self):
-        # self.name = name
+    def __init__(self, name = 'Datawood.csv'):
+        self.name = name
         self.fields = [
             "Index",
             "Width",
@@ -39,7 +39,7 @@ class DigitalIntake:
 
         ]
 
-        # self.data = pd.read_csv(self.name, usecols=self.fields, delimiter=',')
+        self.data = pd.read_csv(self.name, usecols=self.fields, delimiter=',')
         # self.wood_list = []
         # self.requirement_list = []
         # self.matching_list = []
@@ -62,8 +62,8 @@ class DigitalIntake:
 
         dataset = dataset[self.fields]
         self.data = dataset
-        self.wood_list = self.data.to_dict('records')
-
+        wood_list = self.data.to_dict('records')
+        return wood_list
 
 
     def __str__(self):
@@ -287,15 +287,11 @@ class Graphical_elements:
 
 
 def main():
-    # Initializing data frame from CSV
-    # csv_file = getcwd() + '/Generated_wood_data.csv'
-    DigIn = DigitalIntake()
-    DigIn.get_data_api()
-    dataset = DigIn.data
+     # Initializing data frame from CSV
+    csv_file = getcwd() + '/Generated_wood_data.csv'
+    DigIn = DigitalIntake(csv_file)
 
-
-    # dataset = DigitalIntake(csv_file).convert()
-    # DigIn.wood_list = dataset.to_dict('records')
+    
 
 
     # wood_list = DigIn.generate_new_wood(n = 50)
@@ -308,7 +304,15 @@ def main():
             "a data base of residual wood.")
 
     st.subheader("Digital Intake Results (Waste Wood from CW4N)")
-    
+    if st.button('Get data from the API'):
+        
+        DigIn.wood_list = DigIn.get_data_api()
+        dataset = DigIn.data
+    else:
+
+        # Initializing data frame from CSV
+        dataset = DigitalIntake(csv_file).convert()
+        DigIn.wood_list = dataset.to_dict('records')
 
     if st.button('Update the dataset'):
         st.write(pd.DataFrame(DigIn.wood_list))
