@@ -1,51 +1,21 @@
 Index,Width,Length,Height,Type,Color,Timestamp,Density,Weight,Reserved,Reservation name,Reservation time,Requirements,Source,Price,Info
-0,284,568,42,Soft Wood,[186 179 163],2023-01-18 10:18,505,342,False,,,0,Robot Lab,5,
-1,286,640,48,Hard Wood,[152 127 109],2023-01-18 10:18,215,188,False,,,0,Robot Lab,5,
-2,150,503,32,Hard Wood,[122 159 128],2023-01-18 10:18,570,137,False,,,0,Robot Lab,5,
-3,296,385,36,Soft Wood,[185 161 174],2023-01-18 10:18,487,199,False,,,0,Robot Lab,5,
-4,223,967,45,Hard Wood,[142 196 165],2023-01-18 10:18,448,434,False,,,0,Robot Lab,5,
-5,191,313,44,Hard Wood,[122 185 104],2023-01-18 10:18,377,99,False,,,0,Robot Lab,5,
-6,220,741,32,Hard Wood,[143 112 133],2023-01-18 10:18,339,176,False,,,0,Robot Lab,5,
-7,193,931,37,Soft Wood,[154 110 134],2023-01-18 10:18,204,135,False,,,0,Robot Lab,5,
-8,102,701,30,Soft Wood,[172 185 186],2023-01-18 10:18,478,102,False,,,0,Robot Lab,5,
-9,116,620,49,Hard Wood,[176 159 137],2023-01-18 10:18,410,144,False,,,0,Robot Lab,5,
-10,138,772,30,Soft Wood,[160 114 199],2023-01-18 10:18,312,99,False,,,0,Robot Lab,5,
-11,184,571,45,Soft Wood,[136 147 185],2023-01-18 10:18,590,278,False,,,0,Robot Lab,5,
-12,265,600,45,Soft Wood,[104 141 157],2023-01-18 10:18,400,286,False,,,0,Robot Lab,5,
-13,255,711,39,Hard Wood,[146 102 160],2023-01-18 10:18,273,193,False,,,0,Robot Lab,5,
-14,163,314,48,Hard Wood,[169 110 179],2023-01-18 10:18,376,92,False,,,0,Robot Lab,5,
-15,248,505,49,Soft Wood,[109 176 188],2023-01-18 10:18,353,216,False,,,0,Robot Lab,5,
-16,252,768,39,Soft Wood,[155 100 145],2023-01-18 10:18,292,220,False,,,0,Robot Lab,5,
-17,116,927,45,Soft Wood,[138 152 117],2023-01-18 10:18,589,285,False,,,0,Robot Lab,5,
-18,252,982,37,Hard Wood,[181 139 161],2023-01-18 10:18,681,623,False,,,0,Robot Lab,5,
-19,128,720,45,Hard Wood,[190 179 197],2023-01-18 10:18,348,144,False,,,0,Robot Lab,5,
-20,244,303,38,Hard Wood,[169 122 156],2023-01-18 10:18,318,89,False,,,0,Robot Lab,5,
-21,294,715,42,Soft Wood,[192 131 139],2023-01-18 10:18,467,412,False,,,0,Robot Lab,5,
-22,229,559,35,Hard Wood,[150 123 154],2023-01-18 10:18,521,233,False,,,0,Robot Lab,5,
-23,297,601,37,Hard Wood,[198 119 192],2023-01-18 10:18,406,268,False,,,0,Robot Lab,5,
-24,226,921,44,Hard Wood,[145 120 195],2023-01-18 10:18,551,504,False,,,0,Robot Lab,5,
-25,187,989,45,Soft Wood,[172 105 124],2023-01-18 10:18,543,451,False,,,0,Robot Lab,5,
-26,145,919,50,Soft Wood,[122 153 186],2023-01-18 10:18,397,264,False,,,0,Robot Lab,5,
-27,205,861,40,Soft Wood,[192 197 137],2023-01-18 10:18,694,489,False,,,0,Robot Lab,5,
-28,298,889,48,Hard Wood,[161 166 105],2023-01-18 10:18,276,350,False,,,0,Robot Lab,5,
-29,174,900,44,Soft Wood,[161 159 108],2023-01-18 10:18,319,219,False,,,0,Robot Lab,5,
-30,184,606,37,Soft Wood,[141 195 170],2023-01-18 10:18,204,84,False,,,0,Robot Lab,5,
-31,107,313,41,Soft Wood,[109 157 159],2023-01-18 10:18,692,95,False,,,0,Robot Lab,5,
-32,263,306,46,Soft Wood,[116 109 197],2023-01-18 10:18,322,119,False,,,0,Robot Lab,5,
-33,126,320,41,Soft Wood,[146 152 184],2023-01-18 10:18,305,50,False,,,0,Robot Lab,5,
-34,214,316,37,Hard Wood,[131 195 123],2023-01-18 10:18,254,63,False,,,0,Robot Lab,5,
-35,245,805,35,Hard Wood,[189 139 136],2023-01-18 10:18,330,227,False,,,0,Robot Lab,5,
-36,241,421,39,Soft Wood,[113 104 176],2023-01-18 10:18,289,114,False,,,0,Robot Lab,5,
-37,193,837,43,Soft Wood,[119 101 112],2023-01-18 10:18,270,187,False,,,0,Robot Lab,5,
-38,198,455,31,Hard Wood,[180 198 103],2023-01-18 10:18,675,188,False,,,0,Robot Lab,5,
-39,145,653,39,Soft Wood,[154 104 155],2023-01-18 10:18,451,166,False,,,0,Robot Lab,5,
-40,296,835,34,Soft Wood,[169 187 161],2023-01-18 10:18,306,257,False,,,0,Robot Lab,5,
-41,282,640,33,Hard Wood,[120 119 190],2023-01-18 10:18,652,388,False,,,0,Robot Lab,5,
-42,206,798,31,Soft Wood,[186 191 115],2023-01-18 10:18,597,304,False,,,0,Robot Lab,5,
-43,183,902,49,Hard Wood,[100 119 156],2023-01-18 10:18,497,401,False,,,0,Robot Lab,5,
-44,254,555,47,Soft Wood,[103 134 108],2023-01-18 10:18,617,408,False,,,0,Robot Lab,5,
-45,276,364,30,Soft Wood,[188 107 194],2023-01-18 10:18,652,196,False,,,0,Robot Lab,5,
-46,272,943,38,Hard Wood,[190 182 140],2023-01-18 10:18,600,584,False,,,0,Robot Lab,5,
-47,198,345,42,Hard Wood,[114 189 170],2023-01-18 10:18,407,116,False,,,0,Robot Lab,5,
-48,117,472,42,Hard Wood,[170 183 176],2023-01-18 10:18,249,57,False,,,0,Robot Lab,5,
-49,179,522,43,Hard Wood,[152 198 127],2023-01-18 10:18,224,89,False,,,0,Robot Lab,5,
+0,80,1040,21,Hardwood,"222,130,34",2022-12-21 11:37:56,257,449,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+1,38,650,30,Hardwood,"246,132,66",2022-12-21 11:37:56,1166,864,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+2,61,807,18,Hardwood,"238,125,80",2022-12-21 11:37:56,145,128,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+3,94,348,29,Hardwood,"213,135,47",2022-12-21 11:37:56,445,422,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+4,65,690,18,Hardwood,"217,129,55",2022-12-21 11:37:56,353,285,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+5,43,653,15,Hardwood,"213,127,41",2022-12-21 11:37:56,1650,694,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+6,70,1360,15,Hardwood,"215,130,35",2022-12-21 11:37:56,303,433,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+7,100,825,18,Hardwood,"228,138,59",2022-12-21 11:37:56,147,219,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+8,111,1000,18,Hardwood,"240,138,65",2022-12-21 11:37:56,473,944,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+9,80,1030,22,Hardwood,"253,134,66",2022-12-21 11:37:56,550,996,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+10,100,928,25,Hardwood,"235,125,49",2022-12-21 11:37:56,139,323,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+11,79,1185,18,Hardwood,"207,139,66",2022-12-21 11:37:56,353,595,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+12,72,1775,18,Hardwood,"212,132,24",2022-12-21 11:37:56,147,338,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+13,90,1300,24,Hardwood,"228,122,71",2022-12-21 11:37:56,59,166,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+14,146,538,24,Hardwood,"216,139,57",2022-12-21 11:37:56,424,800,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+15,115,485,24,Hardwood,"211,136,42",2022-12-21 11:37:56,621,831,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+16,94,330,29,Hardwood,"225,122,20",2022-12-21 11:37:56,679,611,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+17,40,440,34,Hardwood,"204,130,65",2022-12-21 11:37:56,550,329,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+18,126,309,23,Hardwood,"250,136,90",2022-12-21 11:37:56,212,189,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
+19,55,750,20,Hardwood,"212,120,78",2022-12-21 11:37:56,819,675,True,Timo,2022-12-21 11:37:56,1,Robot Lab,5,Residual wood from the lab
