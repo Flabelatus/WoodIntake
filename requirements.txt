@@ -7,3 +7,4 @@ requests
 pillow
 plotly
 datetime
+dotenv
