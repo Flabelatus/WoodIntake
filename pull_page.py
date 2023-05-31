@@ -47,7 +47,11 @@ class pull_page:
 
         n_runs = st.slider('Number of runs for Monte Carlo:', 1, 100, 30)
         if st.button('Match the requirements with the available wood - improved - Monte Carlo'):
-            self.MC_match(DigIn, n_runs, option)
+            matching_df, unmatched_df = self.MC_match(DigIn, n_runs, option)
+
+            if st.button('Send POST call (to Grasshopper?/DB) (test button) with this matching df'):
+                st.write(matching_df)
+                st.write("For now this doesn't do anything yet")
 
 
         if st.button('Match the requirements with the available wood - simple'):
@@ -75,7 +79,7 @@ class pull_page:
 
             # Visualize the matched planks
             if len(matching_df):
-                st.write(matching_df)
+                
                 st.write("Matching Dataframe is saved in a CSV file")
                 matching_df.to_csv('matching_df.csv', index=False)
                 st.subheader('Showing all the planks in the dataset and the matching requirements')
@@ -95,8 +99,11 @@ class pull_page:
                 fig = GraphicalElements(dataset).barchart_plotly_one(dataset=unmatched_df,
                                                                      color='maroon', requirements=True)
                 st.plotly_chart(fig, use_container_width=True)
+
+            return matching_df, unmatched_df
         else:
             st.write('Requirements are not found')
+
 
     def simple_match(self, DigIn):
         if os.path.exists('requirements.csv'):
