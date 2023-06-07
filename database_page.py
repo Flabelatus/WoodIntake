@@ -18,7 +18,7 @@ class database_page:
         self.wood_list = None
         self.requirement_list = None
         self.fields = DigIn.fields
-        self.data = self.get_data_api()
+        self.data = DigIn.get_data_api()
 
         # Fetch data from the database
         DigIn.wood_list = DigIn.get_data_api()
@@ -40,17 +40,27 @@ class database_page:
         st.download_button('Download Table', dataset.to_csv(), mime='text/csv')
 
 
-        st.subheader('Length and width distribution in mm of the dataset\n')
-        fig = self.barchart_plotly_one(
-            dataset.sort_values(by=['Length'], ascending=False), color='blue')
-        st.plotly_chart(fig, use_container_width=True)
+        
 
-        if os.path.exists('requirements.csv'):
-            requirement_df = pd.read_csv('requirements.csv')
-            # length_values_req = requirement_df['Length']
-            st.subheader('Length and width distribution in mm of the requirements\n')
-            fig = self.barchart_plotly_one(requirement_df, color='red', requirements=True)
-        st.plotly_chart(fig, use_container_width=True)
+        tab1, tab2 = st.tabs(["Database", "Requirements"])
+
+        with tab1:
+            st.subheader('Length and width distribution in mm of the dataset\n')
+            fig = self.barchart_plotly_one(
+                dataset.sort_values(by=['Length'], ascending=False), color='blue')
+            st.plotly_chart(fig, use_container_width=True)
+
+        with tab2:
+            if os.path.exists('requirements.csv'):
+                requirement_df = pd.read_csv('requirements.csv')
+                # length_values_req = requirement_df['Length']
+                st.subheader('Length and width distribution in mm of the requirements\n')
+                fig = self.barchart_plotly_one(requirement_df, color='red', requirements=True)
+            st.plotly_chart(fig, use_container_width=True)
+
+        # with tab3:
+        #    st.header("An owl")
+        #    st.image("https://static.streamlit.io/examples/owl.jpg", width=200)
 
 
         st.subheader('Length Distribution in mm of the dataset in Plotly')
@@ -60,32 +70,6 @@ class database_page:
 
         self.show_color(dataset, style = 'API')
 
-
-    def get_data_api(self):
-
-        # api-endpoint
-        URL = "https://wood-db.onrender.com/residual_wood"
-        # sending get request and saving the response as response object
-        r = requests.get(url=URL)
-
-        # extracting data in json format
-        data = r.json()
-        dataset = pd.DataFrame(data)
-
-        # convert to right type
-        dataset = dataset.astype({"width": "int", "length": "int", "height": "int",
-                                  "density": "int", "weight": "int", "price": "int"})
-        # get the right order of columns to use
-        dataset.columns = dataset.columns.str.title()
-        dataset.rename(columns={'Id': 'Index', 'Reservation_Time': 'Reservation time',
-                                'Reservation_Name': 'Reservation name'}, inplace=True)
-
-        dataset = dataset[self.fields]
-        self.data = dataset
-
-        wood_list = self.data.to_dict('records')
-        self.wood_list = wood_list
-        return wood_list
 
     def barchart_plotly_one(self, dataset, color, requirements='False'):
 

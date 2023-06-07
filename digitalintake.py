@@ -37,7 +37,7 @@ class DigitalIntake:
             'Reserved',
             "Reservation name",
             "Reservation time",
-            "Requirements",
+            # "Requirements",
             "Source",
             "Price",
             "Info"
@@ -112,7 +112,7 @@ class DigitalIntake:
         index = 1
 
         for stool in range(n_stools):
-            for n in range(leg_parts):
+            for n in range(leg_parts[0]):
                 length, width, height = leg_parts[1]['length'], leg_parts[1]['width'], leg_parts[1]['height']
                 row = {
                     'part_index': index,
@@ -124,6 +124,7 @@ class DigitalIntake:
                     'tag': tag
                 }
                 # insert into db via post call
+                print(row)
                 response = requests.post(
                     url=os.environ.get("DATABASE_URL") + "/requirements/client",
                     data=row,
@@ -138,7 +139,7 @@ class DigitalIntake:
                 requirement_list.append(row)
                 index += 1
 
-            for n in range(top_parts):
+            for n in range(top_parts[0]):
                 length, width, height = top_parts[1]['length'], top_parts[1]['width'], top_parts[1]['height']
                 row = {
                     'part_index': index,
@@ -164,7 +165,7 @@ class DigitalIntake:
                 requirement_list.append(row)
                 index += 1
 
-            for n in range(side_parts):
+            for n in range(side_parts[0]):
                 length, width, height = side_parts[1]['length'], side_parts[1]['width'], side_parts[1]['height']
                 row = {
                     'part_index': index,
@@ -326,25 +327,25 @@ class DigitalIntake:
         self.requirement_list = requirement_list
         return requirement_list
 
-    # def read_requirements_from_client(self):
-    #     """Get the requirements from client e.g. Grasshopper or Dashboard"""
-    #     # Get the requirements that share the same project ID from the API
-    #     db_url = os.environ.get("DATABASE_URL")
-    #
-    #     requirements_endpoint = db_url + "/requirements/client"
-    #     response = requests.get(url=requirements_endpoint, headers={"Content-Type": "application/json"})
-    #     if response.status_code != 200:
-    #         raise Exception(
-    #         f"something went wrong fetching data for requirements status code: {response.status_code}"
-    #         )
-    #     requirements_list = response.json()
-    #
-    #     # Get the woods from the API
-    #     woods_endpoint = db_url + "/residual_woods"
-    #     resp = requests.get(url=woods_endpoint, headers={"Content-Type": "application/json"})
-    #     if resp.status_code != 200:
-    #         raise Exception(f"something went wrong fetching data for residual wood status code: {resp.status_code}")
-    #     wood_list = resp.json()
+    def read_requirements_from_client(self, project_id):
+        """Get the requirements from client e.g. Grasshopper or Dashboard"""
+        # Get the requirements that share the same project ID from the API
+        db_url = os.environ.get("DATABASE_URL")
+    
+        requirements_endpoint = db_url + "/requirements/client"
+        response = requests.get(url=requirements_endpoint, headers={"Content-Type": "application/json"})
+        if response.status_code != 200:
+            raise Exception(
+            f"something went wrong fetching data for requirements status code: {response.status_code}"
+            )
+        requirements_list = response.json()
+    
+        # Get the woods from the API
+        woods_endpoint = db_url + "/residual_woods"
+        resp = requests.get(url=woods_endpoint, headers={"Content-Type": "application/json"})
+        if resp.status_code != 200:
+            raise Exception(f"something went wrong fetching data for residual wood status code: {resp.status_code}")
+        wood_list = resp.json()
 
     def match_requirements_dataset(self, requirement_list):
         """This function matches the requirements from the generated requirements and selects fitting  planks
@@ -520,7 +521,7 @@ def main():
 
     if sidebar == 'Database':
         DB_page = database_page(DigIn)
-        DigIn.wood_list = DB_page.get_data_api()
+        DigIn.wood_list = DigIn.get_data_api()
 
     elif sidebar == 'Pull':
         object_based_page = pull_page(DigIn)

@@ -21,48 +21,60 @@ class pull_page:
         self.requirement_list = None
         self.fields = DigIn.fields
 
+        st.title("Pull design from Grasshopper and match with available wood")
 
-        image = Image.open('stool_image.jpg')
-        st.image(image, caption='Image of a stool')
+        st.subheader("Example how it works")
+        st.text("Here is a visual shown of how it works")
 
-        st.subheader("Generate a general requirements set of a stool")
-        n_stools = st.slider('Number of stools:', 0, 5, 1)
-        if st.button('Generate requirements'):
-            st.write('General requirements are generated')
-            DigIn.generate_requirements_stool(n_stools)
-            # DigIn.generate_requirements(size = 4, n_planks = 30)
+        st.subheader('Pull a project saved in the database')
+
+        project_id = st.text_input('What is the project id?', 'Stool_1')
+        if st.button('Pull requirements through API'):
+            st.write('Requirements are generated through an API call')
+            DigIn.read_requirements_from_client(project_id = project_id)
             requirement_df = pd.DataFrame(DigIn.requirement_list)
-            # print(DigIn.requirement_list)
             st.write(requirement_df)
-            st.write("Requirements are saved in a CSV file")
-            requirement_df.to_csv('requirements.csv', index=False)
 
+
+        tab1, tab2, tab3 = st.tabs(["Show design", "Match design", "Reserve matched wood"])
+
+        with tab1:
+            if os.path.exists('requirements.csv'):
+                requirement_df = pd.read_csv('requirements.csv')
+                # length_values_req = requirement_df['Length']
+                st.subheader('Length and width distribution in mm of the requirements\n')
+                fig = GraphicalElements.barchart_plotly_one(requirement_df, color='red', requirements=True)
+            st.plotly_chart(fig, use_container_width=True)
+
+        with tab2:
+            option = st.selectbox(
+                'How would you like to optimize the matching algorithm?',
+                ('Minimum waste', 'Keep long planks', 'Most parts found in database', 'Minimum cuts needed'))
+
+            n_runs = st.slider('Number of runs for Monte Carlo:', 1, 100, 30)
+            if st.button('Match the requirements with the available wood - improved - Monte Carlo'):
+                matching_df, unmatched_df = self.MC_match(DigIn, n_runs, option)
+
+                if st.button('Send POST call (to Grasshopper?/DB) (test button) with this matching df'):
+                    st.write(matching_df)
+                    st.write("For now this doesn't do anything yet")
+
+
+            if st.button('Match the requirements with the available wood - simple'):
+                self.simple_match(DigIn)
+                
         
 
         # def match_requirement_dataset_improved(self, requirement_list, n_runs = 10):
 
-        option = st.selectbox(
-            'How would you like to optimize the matching algorithm?',
-            ('Minimum waste', 'Keep long planks', 'Most parts found in database', 'Minimum cuts needed'))
-
-        n_runs = st.slider('Number of runs for Monte Carlo:', 1, 100, 30)
-        if st.button('Match the requirements with the available wood - improved - Monte Carlo'):
-            matching_df, unmatched_df = self.MC_match(DigIn, n_runs, option)
-
-            if st.button('Send POST call (to Grasshopper?/DB) (test button) with this matching df'):
-                st.write(matching_df)
-                st.write("For now this doesn't do anything yet")
-
-
-        if st.button('Match the requirements with the available wood - simple'):
-            self.simple_match(DigIn)
-            
+        
+        with tab3:
         # st.subheader("Match the requirements with the available wood")
-        st.subheader('Reserve the wood based on matched requirements')
-        res_name = st.text_input('Reservation name', 'Javid')
-        res_number = st.text_input('Reservation number', '1')
-        st.write('The reservation will be on ', res_name + '-' + res_number)
-        reservation(DigIn, res_name, res_number)
+            st.subheader('Reserve the wood based on matched requirements')
+            res_name = st.text_input('Reservation project', 'Stool')
+            res_number = st.text_input('Reservation id', '1')
+            st.write('The reservation will be on ', res_name + '-' + res_number)
+            reservation(DigIn, res_name, res_number)
         
 
 
