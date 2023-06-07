@@ -102,7 +102,7 @@ class DigitalIntake:
             top_parts=(5, {'length': 360, 'width': 70, 'height': 18}),
             side_parts=(4, {'length': 355, 'width': 61, 'height': 18}),
             leg_parts=(4, {'length': 530, 'width': 90, 'height': 25}),
-            project_id="1",
+            project_id=1,
             tag="stool",
     ):
         """Simplified function the Same as generate_requirements_stool method. However, with this addition
@@ -124,18 +124,12 @@ class DigitalIntake:
                     'tag': tag
                 }
                 # insert into db via post call
-                print(row)
-                response = requests.post(
-                    url=os.environ.get("DATABASE_URL") + "/requirements/client",
-                    data=row,
-                    headers={
-                        "Content-Type": "application/json"
-                    }
-                )
-                if response.status_code != 201:
-                    raise Exception(
-                        "something went wrong inserting row in the db status code: {0}".format(response.status_code)
-                    )
+                # print(row)
+                self.post_call_requirement(row)
+                
+                    # raise Exception(
+                        # "something went wrong inserting row in the db status code: {0}".format(response.status_code)
+                    # )
                 requirement_list.append(row)
                 index += 1
 
@@ -150,18 +144,10 @@ class DigitalIntake:
                     'project_id': project_id,
                     'tag': tag
                 }
+
                 # insert into db via post call
-                response = requests.post(
-                    url=os.environ.get("DATABASE_URL") + "/requirements/client",
-                    data=row,
-                    headers={
-                        "Content-Type": "application/json"
-                    }
-                )
-                if response.status_code != 201:
-                    raise Exception(
-                        "something went wrong inserting row in the db status code: {0}".format(response.status_code)
-                    )
+                self.post_call_requirement(row)
+
                 requirement_list.append(row)
                 index += 1
 
@@ -176,23 +162,36 @@ class DigitalIntake:
                     'project_id': project_id,
                     'tag': tag
                 }
+
                 # insert into db via post call
-                response = requests.post(
-                    url=os.environ.get("DATABASE_URL") + "/requirements/client",
-                    data=row,
-                    headers={
-                        "Content-Type": "application/json"
-                    }
-                )
-                if response.status_code != 201:
-                    raise Exception(
-                        "something went wrong inserting row in the db status code: {0}".format(response.status_code)
-                    )
+                self.post_call_requirement(row)
+
                 requirement_list.append(row)
                 index += 1
 
         self.requirement_list = requirement_list
         return requirement_list
+
+    def post_call_requirement(self, row):
+        
+        url = os.environ.get("DATABASE_URL")
+
+        try:
+            response = requests.post(
+                url=url+ "/requirements/client",
+                data=row,
+                headers={"Content-Type": "application/json"}
+            )
+            print(response)
+        # if response.status_code != 200:
+        #     raise Exception(
+        #                 "something went wrong inserting row in db status code: {0}".format(response.status_code)
+        #             )
+        except requests.exceptions.RequestException as e:
+            raise SystemExit(e)
+        except requests.exceptions.HTTPError as err:
+            raise SystemExit(err)
+
 
     def generate_requirements_stool(self, n_stools=1):
         """
