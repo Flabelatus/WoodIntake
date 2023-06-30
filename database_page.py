@@ -9,6 +9,8 @@ import plotly.graph_objects as go
 from PIL import Image
 import requests
 
+from reservation_system import unreserve
+
 class database_page:
     """A class to read the saved csv data from the wood intake process"""
 
@@ -29,16 +31,28 @@ class database_page:
                 "the digital intake process in the Robot Lab as means of building\n"
                 "a data base of residual wood.")
 
-        st.subheader("Digital Intake Results from the Robot Lab")
+        
+        # show an image of the overview
+        database_image = Image.open('database_image.png')
 
+        st.image(database_image, caption='Database image')
+
+
+        st.subheader("Digital Intake Results from the Robot Lab")
         dataset = DigIn.data
         # style = 'API'
 
-        dataset.to_csv("Generated_wood_data.csv", index=False)
+        
+
+        if st.button('Refresh data'):
+            dataset = DigIn.data
+
         st.write(pd.DataFrame(DigIn.wood_list))
         st.write(f'TOTAL Number of wood scanned: {len(dataset["Index"])}')
         st.download_button('Download Table', dataset.to_csv(), mime='text/csv')
 
+        if st.button('Unreserve all wood'):
+            unreserve(DigIn, unreserve_all = True)
 
         
 
@@ -51,36 +65,43 @@ class database_page:
             st.plotly_chart(fig, use_container_width=True)
 
         with tab2:
-            if os.path.exists('requirements.csv'):
-                requirement_df = pd.read_csv('requirements.csv')
+            project_id = st.text_input('Project id of requirement', 'All')
+            # if project_id == 'All'
+            requirement_list = DigIn.read_requirements_from_client(project_id)
                 # length_values_req = requirement_df['Length']
-                st.subheader('Length and width distribution in mm of the requirements\n')
+            st.subheader('Length and width distribution in mm of the requirements\n')
+            requirement_df = pd.DataFrame(requirement_list)
+            if len(requirement_list) > 0:
                 fig = self.barchart_plotly_one(requirement_df, color='red', requirements=True)
-            st.plotly_chart(fig, use_container_width=True)
+                st.plotly_chart(fig, use_container_width=True)
+                if st.button('Delete all requirements through API'):
+                    DigIn.delete_requirements_from_client(delete_all = True)
+            else:
+                st.text('There are no requirements currently available')
 
         # with tab3:
         #    st.header("An owl")
         #    st.image("https://static.streamlit.io/examples/owl.jpg", width=200)
 
 
-        st.subheader('Length Distribution in mm of the dataset in Plotly')
-        fig = self.distplot_plotly(dataset = dataset, x_column="Length", y_column="Width",
-                                                         color="Type")
-        st.plotly_chart(fig, use_container_width=True)
+        # st.subheader('Length Distribution in mm of the dataset in Plotly')
+        # fig = self.distplot_plotly(dataset = dataset, x_column="Length", y_column="Width",
+        #                                                  color="Type")
+        # st.plotly_chart(fig, use_container_width=True)
 
-        self.show_color(dataset, style = 'API')
+        # self.show_color(dataset, style = 'API')
 
 
     def barchart_plotly_one(self, dataset, color, requirements='False'):
 
         if requirements is True:
             fig = go.Figure(data=[go.Bar(
-                x=(dataset['Width'].cumsum() - dataset['Width'] / 2).tolist(),
-                y=dataset['Length'],
-                width=(dataset['Width']).tolist(),  # customize width here
+                x=(dataset['width'].cumsum() - dataset['width'] / 2).tolist(),
+                y=dataset['length'],
+                width=(dataset['width']).tolist(),  # customize width here
                 marker_color=color,
                 opacity=0.8,
-                customdata=dataset['Part'].tolist(),
+                customdata=dataset['part'].tolist(),
                 name='requirement',
                 hovertemplate='Width (mm): %{width:.f}, Length (mm): %{y:.f}, Part: %{customdata:.s}'
             )])

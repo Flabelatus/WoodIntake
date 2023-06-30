@@ -8,7 +8,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 from PIL import Image
 import requests
-from reservation_system import reservation
+from reservation_system import reservation_design
+from matching import matching_design, MC_match, match_requirement_dataset_improved
 
 class push_page:
     """A class to read the saved csv data from the wood intake process"""
@@ -21,140 +22,62 @@ class push_page:
         self.fields = DigIn.fields
         dataset = DigIn.data
 
-        image = Image.open('stool_image.jpg')
-        st.image(image, caption='Image of a stool')
-
-        st.title("Push - a general design")
+        st.title("Form fitting - a general design")
         st.subheader("Example - how it works")
-        st.text("Here is an example of how it works")
-        st.subheader("Generate a general requirements set of a stool")
-        n_stools = st.slider('Number of stools:', 0, 5, 1)
-        if st.button('Generate requirements'):
-            st.write('General requirements are generated')
-            DigIn.generate_requirements_stool(n_stools)
-            # DigIn.generate_requirements(size = 4, n_planks = 30)
-            requirement_df = pd.DataFrame(DigIn.requirement_list)
-            # print(DigIn.requirement_list)
-            st.write(requirement_df)
-            st.write("Requirements are saved in a CSV file")
-            requirement_df.to_csv('requirements.csv', index=False)
 
-        if st.button('Generate requirements of a stool through API'):
-            st.write('Requirements are generated through an API call')
-            print(n_stools)
-            DigIn.generate_requirements_stool_api(n_stools = n_stools)
-            requirement_df = pd.DataFrame(DigIn.requirement_list)
-            st.write(requirement_df)
+        st.text("A preset design is available and used")
+        # show an image of the overview
+        form_fitting_1_image = Image.open('form_fitting_1_image.png')
+
+        st.image(form_fitting_1_image, caption='Form fitting image', width = 500)
+
+        form_fitting_2_image = Image.open('form_fitting_2_image.png')
+
+        st.image(form_fitting_2_image, caption='Form fitting image', width = 500)
 
 
+        st.text('This can then be reserved')
 
-        option = st.selectbox(
-            'How would you like to optimize the matching algorithm?',
-            ('Minimum waste', 'Keep long planks', 'Most parts found in database', 'Minimum cuts needed'))
-
-        n_runs = st.slider('Number of runs for Monte Carlo:', 1, 100, 30)
-        if st.button('Match the requirements with the available wood - improved - Monte Carlo'):
-            matching_df, unmatched_df = self.MC_match(DigIn, n_runs, option)
-
-            if st.button('Send POST call (to Grasshopper?/DB) (test button) with this matching df'):
-                st.write(matching_df)
-                st.write("For now this doesn't do anything yet")
+        # image = Image.open('stool_image.jpg')
+        # st.image(image, caption='Image of a stool')
 
 
-        if st.button('Match the requirements with the available wood - simple'):
-            self.simple_match(DigIn)
+        tab1, tab2, tab3 = st.tabs(["Generate requirements", "Match design", "Reserve matched wood"])
+
+        with tab1:
+            st.subheader("Generate a general requirements set of a stool")
+            n_stools = st.slider('Number of stools:', 0, 5, 1)
+            project_id = st.text_input('project id', 'Stool_1')
             
-        # st.subheader("Match the requirements with the available wood")
-        st.subheader('Reserve the wood based on matched requirements')
-        res_name = st.text_input('Reservation name', 'Javid')
-        res_number = st.text_input('Reservation number', '1')
-        st.write('The reservation will be on ', res_name + '-' + res_number)
-        reservation(DigIn, res_name, res_number)
+            # if st.button('Generate requirements'):
+            #     st.write('General requirements are generated')
+            #     DigIn.generate_requirements_stool(n_stools)
+            #     # DigIn.generate_requirements(size = 4, n_planks = 30)
+            #     requirement_df = pd.DataFrame(DigIn.requirement_list)
+            #     # print(DigIn.requirement_list)
+            #     st.write(requirement_df)
+            #     # st.write("Requirements are saved in a CSV file")
+            #     # requirement_df.to_csv('requirements.csv', index=False)
 
-        st.header("Checking for specific pieces to use in Grasshopper to check if they match")
+            if st.button('Generate requirements of a stool through API'):
+                st.write('Requirements are generated through an API call')
 
-        DigIn.wood_list = DigIn.get_data_api()
-        dataset = pd.DataFrame(DigIn.wood_list)
-        st.write(dataset)
+                DigIn.generate_requirements_stool_api(n_stools = n_stools, project_id = project_id)
+                self.requirement_list = DigIn.requirement_list.copy()
+                requirement_df = pd.DataFrame(DigIn.requirement_list)
+                st.write(requirement_df)
 
-        st.subheader(f"Filter desired pieces")
-        filtered_df = dataset.copy()
+        with tab2:
+            requirement_list = DigIn.read_requirements_from_client(project_id = project_id)
+            # print(requirement_list)
+            # print(wood_list)
+            wood_list = DigIn.get_data_api()
+            self.matching_df, unmatched_df, optimal_list = matching_design(requirement_list, wood_list)
 
-        # for filter_criteria in ['Length', 'Width', 'Height']:
-        filter_criteria = 'Length'
-        slider_min_val = min(sorted(dataset[filter_criteria]))
-        slider_max_val = max(sorted(dataset[filter_criteria]))
-        slider_length = st.select_slider('{} in mm'.format(filter_criteria),
-                                         options=range(slider_min_val, slider_max_val + 1),
-                                         value=(slider_min_val, slider_max_val), key=filter_criteria)
-        filtered = [
-            row for index, row in filtered_df.iterrows()
-            if slider_length[1] >= row[filter_criteria] >= slider_length[0]
-        ]
-        filtered_df = pd.DataFrame(filtered)
+        
+        with tab3:
+            matching_df = pd.read_csv('matching_df.csv')
+            reservation_design(DigIn, matching_df)
 
-        filter_criteria = 'Width'
-        slider_min_val = min(sorted(dataset[filter_criteria]))
-        slider_max_val = max(sorted(dataset[filter_criteria]))
-        slider_width = st.select_slider('{} in mm'.format(filter_criteria),
-                                        options=range(slider_min_val, slider_max_val + 1),
-                                        value=(slider_min_val, slider_max_val), key=filter_criteria)
-        filtered = [
-            row for index, row in filtered_df.iterrows()
-            if slider_width[1] >= row[filter_criteria] >= slider_width[0]
-        ]
-        filtered_df = pd.DataFrame(filtered)
 
-        filter_criteria = 'Height'
-        slider_min_val = min(sorted(dataset[filter_criteria]))
-        slider_max_val = max(sorted(dataset[filter_criteria]))
-        slider_height = st.select_slider('{} in mm'.format(filter_criteria),
-                                         options=range(slider_min_val, slider_max_val + 1),
-                                         value=(slider_min_val, slider_max_val), key=filter_criteria)
-        filtered = [
-            row for index, row in filtered_df.iterrows()
-            if slider_height[1] >= row[filter_criteria] >= slider_height[0]
-        ]
-        filtered_df = pd.DataFrame(filtered)
-
-        filter_criteria = 'Type'
-        slider_min_val = 'Softwood'
-        slider_max_val = 'Hardwood'
-        slider_height = st.select_slider('{} of wood'.format(filter_criteria), options=['Softwood', 'Hardwood'],
-                                         value=(slider_min_val, slider_max_val), key=filter_criteria)
-        filtered = [
-            row for index, row in filtered_df.iterrows()
-            if row[filter_criteria] == slider_height[1] or row[filter_criteria] == slider_height[0]
-        ]
-        filtered_df = pd.DataFrame(filtered)
-
-        filter_criteria = 'Reserved'
-        slider_min_val = True
-        slider_max_val = False
-        slider_height = st.radio('Is the piece reserved already?'.format(filter_criteria), options=[True, False])
-        filtered = [
-            row for index, row in filtered_df.iterrows()
-            if row[filter_criteria] == slider_height[1] or row[filter_criteria] == slider_height[0]
-        ]
-        filtered_df = pd.DataFrame(filtered)
-
-        if len(filtered_df):
-            st.write("The filtered items in the table are the ID values"
-                     " of the pieces under the selected criteria")
-            st.write(filtered_df)
-        else:
-            st.write('No piece found matching the desired filter')
-        # st.write(dataset)
-        if st.button('Reserve the filtered wood'):
-            matching_list = filtered_df.to_dict('records')
-
-            for index, row in enumerate(matching_list):
-                DigIn.wood_list[row['Index']]['Reservation name'] = str(res_name + '-' + res_number)
-                DigIn.wood_list[row['Index']]['Reserved'] = True
-                DigIn.wood_list[row['Index']]['Reservation time'] = datetime.now().strftime("%Y-%m-%d %H:%M")
-            st.write('The matched wood is reserved!')
-            st.write(pd.DataFrame(DigIn.wood_list))
-
-            pd.DataFrame(DigIn.wood_list).to_csv('Generated_wood_data.csv', index=False)
-
-        st.download_button('Download Selection', filtered_df.to_csv(), mime='text/csv')
+        

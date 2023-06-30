@@ -8,3 +8,4 @@ pillow
 plotly
 datetime
 dotenv
+json
