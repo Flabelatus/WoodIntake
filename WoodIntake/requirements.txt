@@ -1,0 +1,15 @@
+streamlit
+pandas
+matplotlib
+seaborn
+numpy
+requests
+pillow
+plotly
+datetime
+python-dotenv
+shapely
+figures
+ifcopenshell
+mathutils
+streamlit-authenticator
