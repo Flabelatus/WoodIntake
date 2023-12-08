@@ -28,24 +28,25 @@ class GraphicalElements:
 
         if requirements is True:
             fig = go.Figure(data=[go.Bar(
-                x=(dataset['Width'].cumsum() - dataset['Width'] / 2).tolist(),
-                y=dataset['Length'],
-                width=(dataset['Width']).tolist(),  # customize width here
+                x=(dataset['width'].cumsum() - dataset['width'] / 2).tolist(),
+                y=dataset['length'],
+                width=(dataset['width']).tolist(),  # customize width here
                 marker_color=color,
                 opacity=0.8,
-                customdata=dataset['Part'].tolist(),
-                name='requirement',
-                hovertemplate='Width (mm): %{width:.f}, Length (mm): %{y:.f}, Part: %{customdata:.s}'
+                customdata=dataset['part'].tolist(),
+                name='Requirement',
+                hovertemplate='width (mm): %{width:.f}, length (mm): %{y:.f}, part: %{customdata:.s}'
             )])
+            
         else:
             fig = go.Figure(data=[go.Bar(
-                x=(dataset['Width'].cumsum() - dataset['Width'] / 2).tolist(),
-                y=dataset['Length'],
-                width=(dataset['Width']).tolist(),  # customize width here
+                x=(dataset['width'].cumsum() - dataset['width'] / 2).tolist(),
+                y=dataset['length'],
+                width=(dataset['width']).tolist(),  # customize width here
                 marker_color=color,
                 opacity=0.8,
                 name='wood in database',
-                hovertemplate='Width (mm): %{width:.f}, Length (mm): %{y:.f}'
+                hovertemplate='width (mm): %{width:.f}, length (mm): %{y:.f}'
             )])
 
         return fig
@@ -58,8 +59,9 @@ class GraphicalElements:
 
         wood_df = self.dataset.copy()
         # join the two, keeping all of df1's indices
-        joined = pd.merge(matching_df, wood_df.loc[:, ['Index', 'Width', 'Length', 'Height']],
+        joined = pd.merge(matching_df, wood_df.loc[:, ['Index', 'width', 'length', 'height']],
                           left_on='Wood list index', right_on='Index', how='inner')
+        joined = joined.rename(columns={'Width':'width', 'Length':'length', 'Height': 'height'})
         joined = pd.merge(joined, requirement_df, left_on=['Requirements list index'], right_on=['Index'], how='inner')
 
         # Make a trace with a bar chart based on a cumsum to make sure all planks are next to each other. 
@@ -67,25 +69,25 @@ class GraphicalElements:
         # of the database. Lastly, the x starts before a first requirement plank is added, and it is
         # lined up in the middle.
         trace1 = go.Figure(data=[go.Bar(
-            x=((joined['Width_x'].cumsum() + joined['Width_y'].cumsum() - joined['Width_y'] - joined[
-                'Width_x'] / 2)).tolist(),
-            y=joined['Length_x'],
-            width=(joined['Width_x']).tolist(),  # customize width here
+            x=((joined['width_x'].cumsum() + joined['width_y'].cumsum() - joined['width_y'] - joined[
+                'width_x'] / 2)).tolist(),
+            y=joined['length_x'],
+            width=(joined['width_x']).tolist(),  # customize width here
             marker_color='blue',
             opacity=0.8,
             name='wood in database',
-            hovertemplate='Width (mm): %{width:.f}, Length (mm): %{y:.f}'
+            hovertemplate='width (mm): %{width:.f}, length (mm): %{y:.f}'
         )])
 
         trace2 = go.Figure(data=[go.Bar(
-            x=(joined['Width_x'].cumsum() + joined['Width_y'].cumsum() - joined['Width_y'] / 2).tolist(),
-            y=joined['Length_y'],
-            width=(joined['Width_y']).tolist(),  # customize width here
+            x=(joined['width_x'].cumsum() + joined['width_y'].cumsum() - joined['width_y'] / 2).tolist(),
+            y=joined['length_y'],
+            width=(joined['width_y']).tolist(),  # customize width here
             marker_color='red',
-            customdata=joined['Part'].tolist(),
+            customdata=joined['part'].tolist(),
             opacity=0.8,
             name='requirement',
-            hovertemplate='Width (mm): %{width:.f}, Length (mm): %{y:.f}, Part: %{customdata:.s}'
+            hovertemplate='width (mm): %{width:.f}, length (mm): %{y:.f}, part: %{customdata:.s}'
 
         )])
 
@@ -96,11 +98,19 @@ class GraphicalElements:
     def barchart_plotly_two_improved(self, matching_df, requirement_df):
 
         wood_df = self.dataset.copy()
+        # print(wood_df.columns)
+        # print(requirement_df.columns)
 
         # joining together all the data from the requirements dataframe and from the wood in stock and merge those
         joined = pd.merge(matching_df, wood_df.loc[:, ['Index', 'Width', 'Length', 'Height']],
                           left_on='Wood list index', right_on='Index', how='inner')
-        joined = pd.merge(joined, requirement_df, left_on=['Requirements list index'], right_on=['Index'], how='inner')
+        joined = joined.rename(columns={'Width':'width', 'Length':'length', 'Height': 'height'})
+
+        joined = pd.merge(joined, requirement_df, left_on=['Requirements list index'], right_on=['part_index'], how='inner')
+
+        # since woods column is a dict, we cannot use the code that comes below without removing this column
+        joined = joined.loc[:, joined.columns !=  'woods']
+        print(joined.columns)
 
         # check where the required pieces come from the same piece of wood
         dupl_joined = joined.drop_duplicates()['Wood list index'].value_counts().gt(1)
@@ -109,8 +119,8 @@ class GraphicalElements:
         # Giving all the pieces a width cumsum, so that they can be visualised next to each other. 
         # And forward fill to fill gaps where needed.
         joined_2 = joined.drop_duplicates(['Wood list index']).copy()
-        joined_2['Width_x_cumsum'] = joined_2['Width_x'].cumsum()
-        joined['Width_x_cumsum'] = joined_2['Width_x'].cumsum()
+        joined_2['width_x_cumsum'] = joined_2['width_x'].cumsum()
+        joined['width_x_cumsum'] = joined_2['width_x'].cumsum()
         joined = joined.ffill(axis=0)
 
         # Getting the variable width pieces sorted to get the widest planks visualised at the bottom, but the narrowest
@@ -121,40 +131,40 @@ class GraphicalElements:
         joined_5 = df_differing_required_pieces.copy()
 
         trace1 = go.Figure(data=[go.Bar(
-            x=np.ceil((joined_2['Width_x_cumsum'] - joined_2['Width_x'] / 2)).tolist(),
-            y=joined_2['Length_x'],
-            width=(joined_2['Width_x']).tolist(),  # customize width here
+            x=np.ceil((joined_2['width_x_cumsum'] - joined_2['width_x'] / 2)).tolist(),
+            y=joined_2['length_x'],
+            width=(joined_2['width_x']).tolist(),  # customize width here
             marker_color='blue',
             opacity=0.4,
             name='Wood in database',
             xaxis='x',
-            hovertemplate='Width: %{width:.f}, Length: %{y:.f}',
+            hovertemplate='width: %{width:.f}, length: %{y:.f}',
         )])
 
         trace2 = go.Figure(data=[go.Bar(
-            x=(joined['Width_x_cumsum'] - joined['Width_x'] + joined['Width_y'] / 2).tolist(),
-            y=joined['Length_y'],
-            width=(joined['Width_y']).tolist(),  # customize width here
+            x=(joined['width_x_cumsum'] - joined['width_x'] + joined['width_y'] / 2).tolist(),
+            y=joined['length_y'],
+            width=(joined['width_y']).tolist(),  # customize width here
             marker_color='red',
             opacity=1,
             name='Requirements',
             xaxis='x',
-            customdata=joined['Part'].tolist(),
-            hovertemplate='Width (mm): %{width:.f}, Length (mm): %{y:.f}, Part: %{customdata:.s}'
+            customdata=joined['part'].tolist(),
+            hovertemplate='width (mm): %{width:.f}, length (mm): %{y:.f}, part: %{customdata:.s}'
         )])
 
         if len(joined_5) > 0:
             trace3 = go.Figure(data=[go.Bar(
-                x=np.ceil((joined_5['Width_x_cumsum'] - joined_5['Width_x'] + joined_5['Width_y'] / 2)).tolist(),
-                y=joined_5['Length_y'],  # joined_3['Length_y_cumsum'] -
-                #     y=joined_4['Length_y_cumsum'] - joined_4['Length_y'], #joined_3['Length_y_cumsum'] -
-                width=(joined_5['Width_y']).tolist(),  # customize width here
-                marker_color='green',
+                x=np.ceil((joined_5['width_x_cumsum'] - joined_5['width_x'] + joined_5['width_y'] / 2)).tolist(),
+                y=joined_5['length_y'],  # joined_3['length_y_cumsum'] -
+                #     y=joined_4['length_y_cumsum'] - joined_4['length_y'], #joined_3['length_y_cumsum'] -
+                width=(joined_5['width_y']).tolist(),  # customize width here
+                marker_color='red',
                 opacity=0.8,
                 name='Variable req. on 1 piece',
                 xaxis='x',
-                customdata=joined['Part'].tolist(),
-                hovertemplate='Width (mm): %{width:.f}, Length (mm): %{y:.f}, Part: %{customdata:.s}',
+                customdata=joined['part'].tolist(),
+                hovertemplate='width (mm): %{width:.f}, length (mm): %{y:.f}, part: %{customdata:.s}',
             )])
 
         layout = go.Layout(
@@ -165,7 +175,7 @@ class GraphicalElements:
                 #         anchor='x',
                 #         overlaying='x',
                 side="left",
-                range=[0, max(joined_2['Width_x_cumsum'])]
+                range=[0, max(joined_2['width_x_cumsum'])]
             ),
         )
         if len(joined_5) > 0:
@@ -193,9 +203,9 @@ class GraphicalElements:
             for part2 in all_wood_df.to_dict(orient="records"):
                 if (part['Wood list index'] == part2['Wood list index'] and
                         part['Requirements list index'] != part2['Requirements list index'] and
-                        part['Width_y'] < part2['Width_y']):
+                        part['width_y'] < part2['width_y']):
                     part3 = part2.copy()
-                    part3['Width_y'] = part['Width_y']
+                    part3['width_y'] = part['width_y']
 
                     # make sure that we only take the element once to check for other pieces. If there are two other 
                     # pieces with similar lengths, only take once the element with different length.
@@ -207,5 +217,7 @@ class GraphicalElements:
                         wood_list.append(part3)
         new_df = pd.DataFrame(wood_list)
         if len(new_df) > 0:
-            new_df = new_df.sort_values(['Wood list index', 'Width_y', 'Length_y'], ascending=True)
+            new_df = new_df.sort_values(['Wood list index', 'width_y', 'length_y'], ascending=True)
         return new_df
+
+        

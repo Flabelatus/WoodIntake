@@ -7,4 +7,9 @@ requests
 pillow
 plotly
 datetime
-dotenv
+python-dotenv
+shapely
+figures
+ifcopenshell
+mathutils
+streamlit-authenticator

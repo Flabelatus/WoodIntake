@@ -4,17 +4,18 @@ import random
 import numpy as np
 import streamlit as st
 from datetime import datetime
-import plotly.express as px
-import plotly.graph_objects as go
-from PIL import Image
+
 import requests
 from dotenv import load_dotenv
+import json
 
 from database_page import database_page
 from pull_page import pull_page
 from push_page import push_page
+from form_finding import form_finding_page
 
 load_dotenv()
+
 
 class DigitalIntake:
     """A class to read the saved csv data from the wood intake process"""
@@ -37,6 +38,11 @@ class DigitalIntake:
             'Reserved',
             "Reservation name",
             "Reservation time",
+            "Original piece",
+            "Production phase",
+            "Design",
+            "Kind of wood",
+            "Verified measurements",
             # "Requirements",
             "Source",
             "Price",
@@ -49,9 +55,9 @@ class DigitalIntake:
     def get_data_api(self):
 
         # api-endpoint
-        URL = os.environ.get("DATABASE_URL") + "/residual_wood"
+        url = os.environ.get("DATABASE_URL") + "/residual_wood"
         # sending get request and saving the response as response object
-        r = requests.get(url=URL)
+        r = requests.get(url=url)
 
         # extracting data in json format
         data = r.json()
@@ -59,13 +65,23 @@ class DigitalIntake:
 
         # convert to right type
         dataset = dataset.astype({"width": "int", "length": "int", "height": "int",
-                                  "density": "int", "weight": "int", "price": "int"})
+                                  "density": "int", "weight": "int", "price": "float"})
+
         # get the right order of columns to use
         dataset.columns = dataset.columns.str.title()
         dataset.rename(columns={'Id': 'Index', 'Reservation_Time': 'Reservation time',
                                 'Reservation_Name': 'Reservation name'}, inplace=True)
+        st.write(dataset)
+        dataset.rename(columns={"Original_piece": "Original piece",
+                                "Production_phase": "Production phase",
+                                "Kind_of_wood": "Kind of wood",
+                                "Verified_measurements": "Verified measurements"}, inplace=True)
 
-        dataset = dataset[self.fields]
+        try:
+            dataset = dataset[self.fields]
+        except KeyError as err:
+            print(err)
+
         self.data = dataset
 
         wood_list = self.data.to_dict('records')
@@ -81,14 +97,14 @@ class DigitalIntake:
             width = random.randint(min_width, max_width)
             length = random.randint(min_length, max_length)
             height = random.randint(min_height, max_height)
-            Type = random.choice(['Soft Wood', 'Hard Wood'])
-            Color = np.random.randint(100, 200, size=3)
-            Indexed = datetime.now().strftime("%Y-%m-%d %H:%M")
-            Density = random.randint(min_density, max_density)
-            Weight = int(width * length * height * Density / 10000 / 1000)
+            _type = random.choice(['Soft Wood', 'Hard Wood'])
+            color = np.random.randint(100, 200, size=3)
+            indexed = datetime.now().strftime("%Y-%m-%d %H:%M")
+            density = random.randint(min_density, max_density)
+            weight = int(width * length * height * density / 10000 / 1000)
 
             row = {'Index': index, 'Width': width, 'Length': length, 'Height': height,
-                   'Type': Type, 'Color': Color, 'Timestamp': Indexed, 'Density': Density, 'Weight': Weight,
+                   'Type': _type, 'Color': color, 'Timestamp': indexed, 'Density': density, 'Weight': weight,
                    'Reserved': False, 'Reservation name': '', 'Reservation time': '', "Requirements": 0,
                    "Source": "Robot Lab", "Price": 5, "Info": ""}
             wood_list.append(row)
@@ -102,7 +118,7 @@ class DigitalIntake:
             top_parts=(5, {'length': 360, 'width': 70, 'height': 18}),
             side_parts=(4, {'length': 355, 'width': 61, 'height': 18}),
             leg_parts=(4, {'length': 530, 'width': 90, 'height': 25}),
-            project_id=1,
+            project_id="1",
             tag="stool",
     ):
         """Simplified function the Same as generate_requirements_stool method. However, with this addition
@@ -113,37 +129,20 @@ class DigitalIntake:
 
         for stool in range(n_stools):
             for n in range(leg_parts[0]):
+                part = "Leg"
                 length, width, height = leg_parts[1]['length'], leg_parts[1]['width'], leg_parts[1]['height']
-                row = {
-                    'part_index': index,
-                    'width': width,
-                    'length': length,
-                    'height': height,
-                    'part': 'Leg',
-                    'project_id': project_id,
-                    'tag': tag
-                }
+                row = self.make_json_requirement(index, width, length, height, part, tag, project_id)
+
                 # insert into db via post call
-                # print(row)
                 self.post_call_requirement(row)
-                
-                    # raise Exception(
-                        # "something went wrong inserting row in the db status code: {0}".format(response.status_code)
-                    # )
+
                 requirement_list.append(row)
                 index += 1
 
             for n in range(top_parts[0]):
+                part = "Top"
                 length, width, height = top_parts[1]['length'], top_parts[1]['width'], top_parts[1]['height']
-                row = {
-                    'part_index': index,
-                    'width': width,
-                    'length': length,
-                    'height': height,
-                    'part': 'Leg',
-                    'project_id': project_id,
-                    'tag': tag
-                }
+                row = self.make_json_requirement(index, width, length, height, part, tag, project_id)
 
                 # insert into db via post call
                 self.post_call_requirement(row)
@@ -152,16 +151,9 @@ class DigitalIntake:
                 index += 1
 
             for n in range(side_parts[0]):
+                part = "Side"
                 length, width, height = side_parts[1]['length'], side_parts[1]['width'], side_parts[1]['height']
-                row = {
-                    'part_index': index,
-                    'width': width,
-                    'length': length,
-                    'height': height,
-                    'part': 'Leg',
-                    'project_id': project_id,
-                    'tag': tag
-                }
+                row = self.make_json_requirement(index, width, length, height, part, tag, project_id)
 
                 # insert into db via post call
                 self.post_call_requirement(row)
@@ -170,28 +162,41 @@ class DigitalIntake:
                 index += 1
 
         self.requirement_list = requirement_list
+
         return requirement_list
 
-    def post_call_requirement(self, row):
-        
+    def make_json_requirement(self, index, width, length, height, part, tag, project_id):
+        row = {
+            "part_index": index,
+            "width": width,
+            "length": length,
+            "height": height,
+            "part": part,
+            "tag": tag,
+            "project_id": project_id
+        }
+        return row
+
+    @staticmethod
+    def post_call_requirement(row):
+
         url = os.environ.get("DATABASE_URL")
 
-        try:
-            response = requests.post(
-                url=url+ "/requirements/client",
-                data=row,
-                headers={"Content-Type": "application/json"}
-            )
-            print(response)
-        # if response.status_code != 200:
-        #     raise Exception(
-        #                 "something went wrong inserting row in db status code: {0}".format(response.status_code)
-        #             )
-        except requests.exceptions.RequestException as e:
-            raise SystemExit(e)
-        except requests.exceptions.HTTPError as err:
-            raise SystemExit(err)
-
+        print(row)
+        json_row = json.dumps(row)
+        print(json.dumps(row))
+        # for key, value in row.items():
+        #     print(key, value)
+        #     print(type(key), type(value))
+        # print(type(row))
+        # try:
+        response = requests.post(
+            url=url + "/requirements/client",
+            data=json_row,
+            headers={"Content-Type": "application/json"}
+        )
+        # print(response.content)
+        print(response)
 
     def generate_requirements_stool(self, n_stools=1):
         """
@@ -273,13 +278,13 @@ class DigitalIntake:
             for _ in range(complexity):
                 index += 1
                 row = {
-                    'part_index': index,
-                    'width': width,
-                    'length': length,
-                    'height': height,
-                    'part': part,
-                    'tag': tag,
-                    'project_id': project_id
+                    "part_index": index,
+                    "width": width,
+                    "length": length,
+                    "height": height,
+                    "part": part,
+                    "tag": tag,
+                    "project_id": project_id
                 }
                 requirement_list.append(row)
                 # add them in the db
@@ -294,240 +299,81 @@ class DigitalIntake:
         self.requirement_list = requirement_list
         return requirement_list
 
-    def generate_requirements(self, size=1, n_planks=20, complexity=5,
-                              width=[100, 300], length=[300, 1000], height=[30, 50]):
-        """
-        This function uses size and n_planks as inputs to generate requirements.
-        
-        Size: the size input goes from 1 to 5, for size 5 it will generate longer lengths and widths 
-        N_planks: the number of planks that is needed for this project
-        Complexity: the number of differing lengths and widths that is needed for this project
-        """
-
-        requirement_list = []
-
-        min_width, max_width = width
-        min_length, max_length = length
-        min_height, max_height = height
-        max_size = 5
-        index = 0
-
-        for plank in range(int(n_planks / complexity)):
-            width = int(random.randint(min_width, max_width) / (max_size - size))
-            length = int(random.randint(min_length, max_length) / (max_size - size))
-            height = min_height
-
-            #         height = random.randint(min_height, max_height)
-
-            for _ in range(complexity):
-                index += 1
-                row = {'Index': index, 'Width': width, 'Length': length, 'Height': height, 'Part': 'Unknown'}
-                requirement_list.append(row)
-        self.requirement_list = requirement_list
-        return requirement_list
-
-    def read_requirements_from_client(self, project_id):
+    def read_requirements_from_client(self, project_id="1"):
         """Get the requirements from client e.g. Grasshopper or Dashboard"""
         # Get the requirements that share the same project ID from the API
         db_url = os.environ.get("DATABASE_URL")
-    
+
+        # something to configure
+        # if project_id == 'All':
         requirements_endpoint = db_url + "/requirements/client"
+        # else:
+        # requirements_endpoint = db_url + "/requirements/client" + '/' + str(project_id)
+
         response = requests.get(url=requirements_endpoint, headers={"Content-Type": "application/json"})
         if response.status_code != 200:
             raise Exception(
-            f"something went wrong fetching data for requirements status code: {response.status_code}"
+                f"something went wrong fetching data for requirements status code: {response.status_code}"
             )
-        requirements_list = response.json()
-    
-        # Get the woods from the API
-        woods_endpoint = db_url + "/residual_woods"
-        resp = requests.get(url=woods_endpoint, headers={"Content-Type": "application/json"})
-        if resp.status_code != 200:
-            raise Exception(f"something went wrong fetching data for residual wood status code: {resp.status_code}")
-        wood_list = resp.json()
+        requirement_list = response.json()
+        self.requirement_list = requirement_list
 
-    def match_requirements_dataset(self, requirement_list):
-        """This function matches the requirements from the generated requirements and selects fitting  planks
-        from the available dataset."""
+        # # Get the woods from the API
+        # woods_endpoint = db_url + "/residual_woods"
+        # resp = requests.get(url=woods_endpoint, headers={"Content-Type": "application/json"})
+        # if resp.status_code != 200:
+        #     raise Exception(f"something went wrong fetching data for residual wood status code: {resp.status_code}")
+        # wood_list = resp.json()
 
-        wood_list = self.wood_list.copy()
-        matching_list = []
-        unmatched_list = []
-        for i, row_req in enumerate(requirement_list):
-            for index, row_wood in enumerate(wood_list):
-                if (row_req['Width'] < row_wood['Width'] and row_req['Length'] < row_wood['Length']
-                        and not row_wood['Reserved']):
-                    matching_row = {'Requirements list index': row_req['Index'], 'Width req': row_req['Width'],
-                                    'Length req': row_req['Length'], 'Height req': row_req['Height'],
-                                    'Wood list index': row_wood['Index'], 'Width DB': row_wood['Width'],
-                                    'Length DB': row_wood['Length'], 'Height DB': row_wood['Height']}
+        return requirement_list
 
-                    wood_list[index]['Reserved'] = True
-                    matching_list.append(matching_row)
-                    break
+    def delete_requirements_from_client(self, part_index=1000, delete_all=False):
 
-        self.matching_list = matching_list
-        matching_df = pd.DataFrame(matching_list)
-        if len(matching_list):
-            for index, row_req in enumerate(requirement_list):
-                # if matching_df['Index'].isin(index):
-                if index not in matching_df['Requirements list index'].values:
-                    unmatched_list.append(row_req)
-        unmatched_df = pd.DataFrame(unmatched_list)
+        db_url = os.environ.get("DATABASE_URL")
 
-        return matching_df, unmatched_df
+        requirements_endpoint = db_url + "/requirements/client"
+        delete_endpoint = db_url + "/requirement/client"
+        response = None
+        if delete_all:
+            response = requests.get(url=requirements_endpoint, headers={"Content-Type": "application/json"})
+            print(pd.DataFrame(response.json()))
+            print(pd.DataFrame(response.json())['id'])
+            for index in pd.DataFrame(response.json())['id']:
+                response = requests.delete(url=delete_endpoint + '/' + str(index),
+                                           headers={"Content-Type": "application/json"})
+                print(response.json())
+        else:
 
-    def match_requirement_dataset_improved(self, requirement_list, n_runs=30, option="Minimum waste"):
-
-        cuts_list = []
-        wood_cuts_list = []
-        stock_pieces_list = []
-        matching_list_all = []
-        success_list = []
-        waste_list = []
-        unmatched_list = []
-
-        for run in range(n_runs):
-            stock_pieces = pd.DataFrame(self.wood_list).copy()
-            parts = pd.DataFrame(requirement_list).copy()
-            # parts = parts_df.copy()
-            # stock_pieces = stock_pieces_start_df.copy()
-
-            # shuffle
-
-            if option == 'Keep long planks':
-                stock_pieces = stock_pieces.sort_values(by='Length', ascending=True).reset_index(drop=True)
-                parts = parts.sample(frac=1)
-            else:
-                stock_pieces = stock_pieces.sample(frac=1).reset_index(drop=True)
-            wood_cuts = list([0] * len(stock_pieces))
-
-            matching_list = []
-            cuts = 0
-            success = 0
-            waste = []
-            # print(run, 'run')
-            for i, part in parts.iterrows():
-                # print(i, 'part')
-
-                for j, stock in stock_pieces.iterrows():
-                    # print(j, ' stock')
-
-                    if part['Length'] <= stock['Length'] and part['Width'] <= stock['Width']:  # and
-                        # part['Height'] <= stock['Height']):
-                        #                 matching_list.append((part, stock))
-                        # print([stock['Index']])
-                        wood_cuts[stock['Index']] += 1
-                        stock_pieces.loc[j, 'Length'] = stock['Length'] - part['Length']
-                        stock_pieces.loc[j, 'Width'] = stock['Width']
-                        stock_pieces.loc[j, 'Height'] = stock['Height']
-
-                        cuts += 1
-                        success += 1
-                        waste.append((stock['Width'] - part['Width']) * (stock['Height'] - part['Height']))
-
-                        matching_row = {'Requirements list index': part['Index'], 'Wood list index': stock['Index']}
-                        matching_list.append(matching_row)
-                        break
-
-            success_list.append(success == len(parts))
-            cuts_list.append(cuts)
-            waste_list.append(waste)
-            wood_cuts_list.append(wood_cuts)
-            stock_pieces_list.append(stock_pieces)
-            matching_list_all.append(matching_list)
-
-        if option == 'Minimum waste':
-            index_min = waste_list.index(min(waste_list))
-        elif option == 'Keep long planks':
-            index_min = waste_list.index(min(waste_list))
-        elif option == 'Most parts found in database':
-            index_min = success_list.index(max(success_list))
-        elif option == 'Minimum cuts needed':
-            index_min = wood_cuts_list.index(min(wood_cuts_list))
-
-        matching_df = pd.DataFrame(matching_list_all[index_min])
-
-        if len(matching_list):
-            for index, row_req in enumerate(requirement_list):
-                # if matching_df['Index'].isin(index):
-                if index not in matching_df['Requirements list index'].values:
-                    unmatched_list.append(row_req)
-        unmatched_df = pd.DataFrame(unmatched_list)
-
-        return matching_df, unmatched_df
-
-    def match_euc_dis(self, requirement_list):
-        """This function matches the requirements from the generated requirements based on the Euclidean Distance
-        and selects fitting planks from the available dataset."""
-
-        wood_list = self.wood_list.copy()
-        matching_list = []
-        unmatched_list = []
-        # k = len(requirement_list)
-        for index, row_req in enumerate(requirement_list):
-            # distances = []
-            wood_db = []
-            wood_db_index = []
-
-            for index, row_wood in enumerate(wood_list):
-                if (
-                        # row_req['Width'] < row_wood['Width'] and row_req['Length'] < row_wood['Length'] and
-                        not row_wood['Reserved']):
-                    wood_db.append(np.array([row_wood['Width'], row_wood['Length'], row_wood['Height']]))
-                    wood_db_index.append(row_wood['Index'])
-
-            wood_piece = np.array([row_req['Width'], row_req['Length'], row_req['Height']])
-            if wood_db:
-                distances = (np.sqrt(np.sum((wood_db - wood_piece) ** 2, axis=1)))
-
-                # Find the indices of the k nearest neighbors in the database
-                # k_nearest = np.argsort(distances)[:k]
-
-                # Take the minimum of the k nearest neighbors to determine the best match
-                best_match_index = np.argmin(distances)
-
-                # Add the matched piece to the matched_indices list
-                index = wood_db_index[best_match_index]
-
-                #             print('wood piece: ' + str(wood_piece) + 'wood_db: ' + str(wood_list[index]))
-
-                matching_row = {'Requirements list index': row_req['Index'], 'Wood list index': index}
-                wood_list[index]['Reserved'] = True
-                matching_list.append(matching_row)
-
-        matching_df = pd.DataFrame(matching_list)
-        if len(matching_df):
-            for index, row_req in enumerate(requirement_list):
-                # if matching_df['Index'].isin(index):
-                if index not in matching_df['Requirements list index'].values:
-                    unmatched_list.append(row_req)
-        unmatched_df = pd.DataFrame(unmatched_list)
-
-        return matching_df, unmatched_df
-
-
-
+            requests.delete(url=delete_endpoint + '/' + str(part_index), headers={"Content-Type": "application/json"})
+        if response.status_code != 200:
+            raise Exception(
+                f"something went wrong fetching data for requirements status code: {response.status_code}"
+            )
 
 
 def main():
     # Initialize the DigitalIntake
     DigIn = DigitalIntake()
-    dataset = DigIn.data
 
-    ## Adding a sidebar
-    sidebar = st.sidebar.radio('Which page?',("Database", "Pull", "Push"))
+    # Adding a sidebar
+    sidebar = st.sidebar.radio('Pages', (
+        "Database",
+        "Form fitting - free design",
+        "Form fitting - set design",
+        "Form finding"))
 
     if sidebar == 'Database':
-        DB_page = database_page(DigIn)
+        database_page(DigIn)
         DigIn.wood_list = DigIn.get_data_api()
 
-    elif sidebar == 'Pull':
-        object_based_page = pull_page(DigIn)
+    elif sidebar == 'Form fitting - free design':
+        pull_page(DigIn)
 
-    elif sidebar == 'Push':
-        design_based_page = push_page(DigIn)
-    
+    elif sidebar == 'Form fitting - set design':
+        push_page(DigIn)
+
+    elif sidebar == "Form finding":
+        form_finding_page(DigIn)
 
 
 if __name__ == "__main__":
