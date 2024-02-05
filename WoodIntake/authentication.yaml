@@ -3,11 +3,11 @@ credentials:
     jjmies:
       email: j.j.mies@hva.nl
       name: Jerome Mies
-      password: $2b$12$tYmneqYMKZd2qJUh5eB34e/NDvWUxkkGV0GndJoIQRI8vtgtXQIPK #abc
+      password: #abc
     jjooshesh:
       email: j.jooshesh@hva.nl
       name: Javid Jooshesh
-      password: $pbkdf2-sha256$29000$T4lx7l2LkXKOMWbsfU8pBQ$FRqPDvRnfVDZNcWGnqlzixJrrFASlJTSeM/27xd3ADs
+      password: 
 cookie:
   expiry_days: 30
   key: random_signature_key # Must be string
